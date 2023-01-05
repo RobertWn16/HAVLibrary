@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33122.133
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HAVLibrary", "HAVLibrary\HAVLibrary.vcxproj", "{80F52184-1453-42F7-A912-B27483F0ABEB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{80F52184-1453-42F7-A912-B27483F0ABEB}.Debug|x64.ActiveCfg = Debug|x64
+		{80F52184-1453-42F7-A912-B27483F0ABEB}.Debug|x64.Build.0 = Debug|x64
+		{80F52184-1453-42F7-A912-B27483F0ABEB}.Debug|x86.ActiveCfg = Debug|Win32
+		{80F52184-1453-42F7-A912-B27483F0ABEB}.Debug|x86.Build.0 = Debug|Win32
+		{80F52184-1453-42F7-A912-B27483F0ABEB}.Release|x64.ActiveCfg = Release|x64
+		{80F52184-1453-42F7-A912-B27483F0ABEB}.Release|x64.Build.0 = Release|x64
+		{80F52184-1453-42F7-A912-B27483F0ABEB}.Release|x86.ActiveCfg = Release|Win32
+		{80F52184-1453-42F7-A912-B27483F0ABEB}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7F1EEE2D-3419-48E0-84B4-25B684FAA9CA}
+	EndGlobalSection
+EndGlobal
