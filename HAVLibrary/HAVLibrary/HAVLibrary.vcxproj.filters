@@ -13,5 +13,45 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Interfaces">
+      <UniqueIdentifier>{c6c6203a-fa43-40ee-92b9-4000d4b14c3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{635e308a-7eeb-402c-b641-51ec3c98e543}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Private">
+      <UniqueIdentifier>{4b755608-4450-4d06-b468-882648c42dde}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NVDEC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="IMuxer.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IDecoder.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IPresenter.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="IHAV.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="NVDEC.hpp">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="INVDEC.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
