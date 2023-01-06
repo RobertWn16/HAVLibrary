@@ -1,3 +1,7 @@
 ﻿HAVLibrary/.vs
 HAVLibrary/HAVLibrary/x64
 HAVLibrary/x64
+HAVLibrary/ThirdParty/ffmpeg/bin
+HAVLibrary/ThirdParty/ffmpeg/include
+HAVLibrary/ThirdParty/ffmpeg/lib
+HAVLibrary/ThirdParty/NVIDIA_Video_SDK/Interface

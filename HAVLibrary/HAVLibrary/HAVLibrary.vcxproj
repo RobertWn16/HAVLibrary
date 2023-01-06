@@ -54,6 +54,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 12.0.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -70,6 +71,18 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(SolutionDir)ThirdParty\ffmpeg\include;$(SolutionDir)ThirdParty\\NVIDIA_Video_SDK\\Interface;C:\Users\robert\Documents\Personal Projects\HAVLibrary\HAVLibrary\ThirdParty\ffmpeg\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(SolutionDir)ThirdParty\ffmpeg\include;$(SolutionDir)ThirdParty\\NVIDIA_Video_SDK\\Interface;C:\Users\robert\Documents\Personal Projects\HAVLibrary\HAVLibrary\ThirdParty\ffmpeg\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(SolutionDir)ThirdParty\ffmpeg\include;$(SolutionDir)ThirdParty\\NVIDIA_Video_SDK\\Interface;C:\Users\robert\Documents\Personal Projects\HAVLibrary\HAVLibrary\ThirdParty\ffmpeg\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(SolutionDir)ThirdParty\ffmpeg\include;$(SolutionDir)ThirdParty\\NVIDIA_Video_SDK\\Interface;C:\Users\robert\Documents\Personal Projects\HAVLibrary\HAVLibrary\ThirdParty\ffmpeg\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -138,12 +151,12 @@
     <ClInclude Include="IDecoder.hpp" />
     <ClInclude Include="IHAV.hpp" />
     <ClInclude Include="IMuxer.hpp" />
-    <ClInclude Include="INVDEC.hpp" />
     <ClInclude Include="IPresenter.hpp" />
     <ClInclude Include="NVDEC.hpp" />
     <ClInclude Include="pch.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 12.0.targets" />
   </ImportGroup>
 </Project>

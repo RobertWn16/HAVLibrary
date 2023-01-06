@@ -50,8 +50,5 @@
     <ClInclude Include="NVDEC.hpp">
       <Filter>Private</Filter>
     </ClInclude>
-    <ClInclude Include="INVDEC.hpp">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
