@@ -148,12 +148,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CaptureSource.cpp" />
+    <ClCompile Include="FFMPEGCaptureSource.cpp" />
     <ClCompile Include="FFMPEGDemuxer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NVDEC.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FFMPEGCaptureSource.hpp" />
     <ClInclude Include="FFMPEGDemuxer.hpp" />
+    <ClInclude Include="HAVTypes.hpp" />
+    <ClInclude Include="IVCaptureSource.hpp" />
     <ClInclude Include="IDecoder.hpp" />
     <ClInclude Include="IDemuxer.hpp" />
     <ClInclude Include="IHAV.hpp" />

@@ -33,6 +33,12 @@
     <ClCompile Include="FFMPEGDemuxer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CaptureSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FFMPEGCaptureSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IMuxer.hpp">
@@ -57,6 +63,15 @@
       <Filter>Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="FFMPEGDemuxer.hpp">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="HAVTypes.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="IVCaptureSource.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="FFMPEGCaptureSource.hpp">
       <Filter>Private</Filter>
     </ClInclude>
   </ItemGroup>
