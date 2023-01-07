@@ -148,11 +148,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FFMPEGDemuxer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NVDEC.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FFMPEGDemuxer.hpp" />
     <ClInclude Include="IDecoder.hpp" />
+    <ClInclude Include="IDemuxer.hpp" />
     <ClInclude Include="IHAV.hpp" />
     <ClInclude Include="IMuxer.hpp" />
     <ClInclude Include="IPresenter.hpp" />

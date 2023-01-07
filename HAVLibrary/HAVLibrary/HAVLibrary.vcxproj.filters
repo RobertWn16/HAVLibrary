@@ -30,6 +30,9 @@
     <ClCompile Include="NVDEC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FFMPEGDemuxer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IMuxer.hpp">
@@ -48,6 +51,12 @@
       <Filter>Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="NVDEC.hpp">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="IDemuxer.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="FFMPEGDemuxer.hpp">
       <Filter>Private</Filter>
     </ClInclude>
   </ItemGroup>
