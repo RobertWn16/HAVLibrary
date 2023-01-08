@@ -14,7 +14,7 @@ struct VIDEO_SOURCE_DESC
 	unsigned int heigth;
 };
 
-class __declspec(uuid("3E0E196D-A155-431F-AFA1-1BDA94298955")) IVCaptureSource : public IUnknown
+class __declspec(uuid("3E0E196D-A155-431F-AFA1-1BDA94298955")) IVideoSource : public IUnknown
 {
 public:
 	virtual winrt::hresult GetDesc(VIDEO_SOURCE_DESC &desc) = 0;

@@ -1,12 +1,12 @@
 #include "FFMPEGCaptureSource.hpp"
 
-winrt::hresult FFMPEGCaptureSource::GetDesc(VIDEO_SOURCE_DESC& desc)
+winrt::hresult FFMPEGVideoSource::GetDesc(VIDEO_SOURCE_DESC& desc)
 {
 	desc = source_desc;
 	return S_OK;
 }
 
-void FFMPEGCaptureSource::InitSource(FVContext ctx, VIDEO_SOURCE_DESC source)
+void FFMPEGVideoSource::InitSource(FVContext ctx, VIDEO_SOURCE_DESC source)
 {
 	source_ctx.av_fmt_context = ctx.av_fmt_context;
 	source_ctx.av_inp_format = ctx.av_inp_format;

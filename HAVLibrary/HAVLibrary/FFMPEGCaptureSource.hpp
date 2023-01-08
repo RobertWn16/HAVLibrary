@@ -18,7 +18,7 @@ public:
 	AVStream* vstream = nullptr;
 };
 
-struct FFMPEGCaptureSource : winrt::implements<FFMPEGCaptureSource, IVCaptureSource>
+struct FFMPEGVideoSource : winrt::implements<FFMPEGVideoSource, IVideoSource>
 {
 private:
 	FVContext source_ctx;

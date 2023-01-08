@@ -13,7 +13,7 @@ winrt::hresult FFMPEGDemuxer::VideoCapture(int ordinal)
 	return S_OK;
 }
 
-winrt::hresult FFMPEGDemuxer::VideoCapture(std::string path, IVCaptureSource** source)
+winrt::hresult FFMPEGDemuxer::VideoCapture(std::string path, IVideoSource** source)
 {
 	FVContext new_context = { 0 };
 	VIDEO_SOURCE_DESC stream_info;
@@ -45,7 +45,7 @@ winrt::hresult FFMPEGDemuxer::VideoCapture(std::string path, IVCaptureSource** s
 		new_context.av_bsf_context->par_in = new_context.vstream->codecpar;
 	}
 
-	winrt::com_ptr<FFMPEGCaptureSource> private_source = winrt::make_self<FFMPEGCaptureSource>();
+	winrt::com_ptr<FFMPEGVideoSource> private_source = winrt::make_self<FFMPEGVideoSource>();
 	winrt::check_pointer(private_source.get());
 	private_source->InitSource(new_context, stream_info);
 	*source = private_source.get();
