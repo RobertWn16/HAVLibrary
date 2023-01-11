@@ -5,9 +5,6 @@
 #pragma comment(lib, "avformat")
 #pragma comment(lib, "avutil")
 
-static HVCodec AVCOHAV(int avcodec);
-static winrt::hresult AVHr(int avcode);
-
 winrt::hresult FFMPEGDemuxer::VideoCapture(int ordinal)
 {
 	return S_OK;
@@ -26,6 +23,7 @@ winrt::hresult FFMPEGDemuxer::VideoCapture(std::string path, IVideoSource** sour
 	if (vstream_index < 0)
 		return E_INVALIDARG;
 
+	new_context.streamIndex = vstream_index;
 	new_context.vstream = new_context.av_fmt_context->streams[vstream_index];
 
 	stream_info.codec = AVCOHAV(new_context.vstream->codecpar->codec_id);
@@ -34,6 +32,9 @@ winrt::hresult FFMPEGDemuxer::VideoCapture(std::string path, IVideoSource** sour
 		(double)new_context.vstream->avg_frame_rate.den);
 	stream_info.width = new_context.vstream->codecpar->width;
 	stream_info.heigth = new_context.vstream->codecpar->height;
+	stream_info.chroma = AVCHAV(new_context.vstream->codecpar->format);
+	stream_info.bitdepth = new_context.vstream->codecpar->bits_per_raw_sample;
+	
 
 	if (stream_info.codec == HV_CODEC_H264 || stream_info.codec == HV_CODEC_H265_420) {
 		if (stream_info.codec == HV_CODEC_H264)
@@ -43,6 +44,7 @@ winrt::hresult FFMPEGDemuxer::VideoCapture(std::string path, IVideoSource** sour
 
 		winrt::check_hresult(AVHr(av_bsf_alloc(new_context.av_bsf_filter, &new_context.av_bsf_context)));
 		new_context.av_bsf_context->par_in = new_context.vstream->codecpar;
+		winrt::check_hresult(AVHr(av_bsf_init(new_context.av_bsf_context)));
 	}
 
 	winrt::com_ptr<FFMPEGVideoSource> private_source = winrt::make_self<FFMPEGVideoSource>();
@@ -62,40 +64,4 @@ winrt::hresult FFMPEGDemuxer::VideoCapture(std::string IP, unsigned short port)
 winrt::hresult FFMPEGDemuxer::DesktopCapture(int monitor)
 {
 	return E_NOTIMPL;
-}
-
-static winrt::hresult AVHr(int avcode)
-{
-	char buf[BUFSIZ];
-	av_strerror(avcode, buf, AV_ERROR_MAX_STRING_SIZE);
-	if (avcode < 0)
-		return E_FAIL;
-	return S_OK;
-}
-
-static HVCodec AVCOHAV(int avcodec)
-{
-	switch (avcodec)
-	{
-	case AV_CODEC_ID_MPEG1VIDEO:
-		return HV_CODEC_MPEG1;
-	case AV_CODEC_ID_MPEG2VIDEO:
-		return HV_CODEC_MPEG2;
-	case AV_CODEC_ID_VC1:
-		return HV_CODEC_VC1;
-	case AV_CODEC_ID_VP8:
-		return HV_CODEC_VP8;
-	case AV_CODEC_ID_VP9:
-		return HV_CODEC_VP9;
-	case AV_CODEC_ID_H264:
-		return HV_CODEC_H264;
-	case AV_CODEC_ID_HEVC:
-		return HV_CODEC_H265_420;
-	case AV_CODEC_ID_AV1:
-		return HV_CODEC_AV1;
-	default:
-		break;
-	}
-
-	return HV_CODEC_UNSUPPORTED;
 }

@@ -1,4 +1,5 @@
-#include "pch.hpp"
+#pragma once
+#include "IHAVComponent.hpp"
 #include "HAVTypes.hpp"
 
 // {3E0E196D-A155-431F-AFA1-1BDA94298955}
@@ -10,12 +11,15 @@ struct VIDEO_SOURCE_DESC
 	double duration;
 	double framerate;
 	HVCodec codec;
+	HVChroma chroma;
+	unsigned int bitdepth;
 	unsigned int width;
 	unsigned int heigth;
 };
 
-class __declspec(uuid("3E0E196D-A155-431F-AFA1-1BDA94298955")) IVideoSource : public IUnknown
+class __declspec(uuid("3E0E196D-A155-431F-AFA1-1BDA94298955")) IVideoSource : public IHAVComponent
 {
 public:
 	virtual winrt::hresult GetDesc(VIDEO_SOURCE_DESC &desc) = 0;
+	virtual winrt::hresult Parse(void *desc) = 0;
 };

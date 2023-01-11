@@ -148,15 +148,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="FFMPEGCaptureSource.cpp" />
+    <ClCompile Include="DevNVIDIA.cpp" />
+    <ClCompile Include="FFMPEGVideoSource.cpp" />
     <ClCompile Include="FFMPEGDemuxer.cpp" />
+    <ClCompile Include="HAV.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NVDEC.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FFMPEGCaptureSource.hpp" />
+    <ClInclude Include="devNVIDIA.hpp" />
+    <ClInclude Include="FFMPEGVideoSource.hpp" />
     <ClInclude Include="FFMPEGDemuxer.hpp" />
+    <ClInclude Include="HAV.hpp" />
     <ClInclude Include="HAVTypes.hpp" />
+    <ClInclude Include="HAVUtilsPrivate.hpp" />
+    <ClInclude Include="IDev.hpp" />
+    <ClInclude Include="IFrame.hpp" />
+    <ClInclude Include="IHAVComponent.hpp" />
     <ClInclude Include="IVIdeoSource.hpp" />
     <ClInclude Include="IDecoder.hpp" />
     <ClInclude Include="IDemuxer.hpp" />

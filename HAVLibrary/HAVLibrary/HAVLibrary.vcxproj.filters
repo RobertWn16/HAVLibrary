@@ -33,7 +33,13 @@
     <ClCompile Include="FFMPEGDemuxer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FFMPEGCaptureSource.cpp">
+    <ClCompile Include="FFMPEGVideoSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DevNVIDIA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HAV.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -68,7 +74,25 @@
     <ClInclude Include="IVIdeoSource.hpp">
       <Filter>Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="FFMPEGCaptureSource.hpp">
+    <ClInclude Include="FFMPEGVideoSource.hpp">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="HAVUtilsPrivate.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="IFrame.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IDev.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IHAVComponent.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="HAV.hpp">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="devNVIDIA.hpp">
       <Filter>Private</Filter>
     </ClInclude>
   </ItemGroup>

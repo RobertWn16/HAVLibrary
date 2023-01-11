@@ -1,4 +1,5 @@
-#include "FFMPEGCaptureSource.hpp"
+#include "IDemuxer.hpp"
+#include "FFMPEGVideoSource.hpp"
 #include <vector>
 
 struct FVContext;
