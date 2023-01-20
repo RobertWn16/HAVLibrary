@@ -12,6 +12,7 @@ struct VIDEO_SOURCE_DESC
 	double framerate;
 	HVCodec codec;
 	HVChroma chroma;
+	HVFormat format;
 	unsigned int bitdepth;
 	unsigned int width;
 	unsigned int heigth;

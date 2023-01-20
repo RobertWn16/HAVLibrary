@@ -1,11 +1,7 @@
 #pragma once
 #include "IDecoder.hpp"
 #include "HAVUtilsPrivate.hpp"
-#include <cuda.h>
-#include <nvcuvid.h>
-
-#pragma comment(lib, "nvcuvid")
-#pragma comment(lib, "cuda")
+#include "NVFrame.hpp"
 
 struct NVDEC : winrt::implements<NVDEC, IDecoder>
 {
@@ -18,7 +14,7 @@ private:
 
 public:
 	winrt::hresult IsSupported(VIDEO_SOURCE_DESC desc) final;
-	winrt::hresult Decode(IFrame **out) final;
+	winrt::hresult Decode(IFrame *out) final;
 
 	winrt::hresult CreateParser(VIDEO_SOURCE_DESC desc);
 
@@ -33,45 +29,6 @@ public:
 	bool hasDevice = false;
 	bool hasSource = false;
 };
-
-//Utils
-static cudaVideoCodec HAVCONV(int havcodec)
-{
-	switch (havcodec)
-	{
-	case HV_CODEC_MPEG1:
-		return cudaVideoCodec_MPEG1;
-	case HV_CODEC_MPEG2:
-		return cudaVideoCodec_MPEG2;
-	case HV_CODEC_VC1:
-		return cudaVideoCodec_VC1;
-	case HV_CODEC_VP8:
-		return cudaVideoCodec_VP8;
-	case HV_CODEC_VP9:
-		return cudaVideoCodec_VP9;
-	case HV_CODEC_H264:
-		return cudaVideoCodec_H264;
-	case HV_CODEC_H265_420:
-		return cudaVideoCodec_HEVC;
-	case HV_CODEC_AV1:
-		return cudaVideoCodec_AV1;
-	default:
-		break;
-	}
-}
-
-static cudaVideoChromaFormat HAVCHNV(int havchroma)
-{
-	switch (havchroma)
-	{
-	case HV_CHROMA_FORMAT_420:
-		return cudaVideoChromaFormat_420;
-	case HV_CHROMA_FORMAT_422:
-		return cudaVideoChromaFormat_422;
-	case HV_CHROMA_FORMAT_444:
-		return cudaVideoChromaFormat_444;
-	}
-}
 
 static unsigned long GetNumDecodeSurfaces(cudaVideoCodec eCodec, unsigned int nWidth, unsigned int nHeight)
 {

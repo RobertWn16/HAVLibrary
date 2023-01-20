@@ -9,6 +9,11 @@ extern "C"
 	#include <libavutil/avutil.h>
 	#include <libavcodec/bsf.h>
 }
+#include <nvcuvid.h>
+#include <cuda.h>
+
+#pragma comment(lib, "nvcuvid")
+#pragma comment(lib, "cuda")
 
 static winrt::hresult AVHr(int avcode)
 {
@@ -50,4 +55,10 @@ struct PACKET_DESC
 {
 	void* data;
 	int32_t size;
+	int32_t timestamp;
 };
+
+/*static void HAV_LOG(std::string componentName, winrt::hresult code, winrt::hstring errName)
+{
+	std::cout << "[" << componentName << " ]: " << errName << " -> Error code 0x%x";
+}*/

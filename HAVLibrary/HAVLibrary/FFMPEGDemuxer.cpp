@@ -32,15 +32,16 @@ winrt::hresult FFMPEGDemuxer::VideoCapture(std::string path, IVideoSource** sour
 		(double)new_context.vstream->avg_frame_rate.den);
 	stream_info.width = new_context.vstream->codecpar->width;
 	stream_info.heigth = new_context.vstream->codecpar->height;
-	stream_info.chroma = AVCHAV(new_context.vstream->codecpar->format);
-	stream_info.bitdepth = new_context.vstream->codecpar->bits_per_raw_sample;
-	
+	stream_info.chroma = AVFmtChHAV(new_context.vstream->codecpar->format, stream_info.bitdepth);
+	stream_info.format = (stream_info.bitdepth - 8) ? HV_FORMAT_P016 : HV_FORMAT_NV12;
 
-	if (stream_info.codec == HV_CODEC_H264 || stream_info.codec == HV_CODEC_H265_420) {
+	if (stream_info.codec == HV_CODEC_H264 || stream_info.codec == HV_CODEC_H265_420 || stream_info.codec == HV_CODEC_VP9) {
 		if (stream_info.codec == HV_CODEC_H264)
 			new_context.av_bsf_filter = av_bsf_get_by_name("h264_mp4toannexb");
 		if (stream_info.codec == HV_CODEC_H265_420)
 			new_context.av_bsf_filter = av_bsf_get_by_name("hevc_mp4toannexb");
+		if (stream_info.codec == HV_CODEC_VP9)
+			new_context.av_bsf_filter = av_bsf_get_by_name("vp9_superframe");
 
 		winrt::check_hresult(AVHr(av_bsf_alloc(new_context.av_bsf_filter, &new_context.av_bsf_context)));
 		new_context.av_bsf_context->par_in = new_context.vstream->codecpar;

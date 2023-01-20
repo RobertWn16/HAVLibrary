@@ -32,18 +32,57 @@ public:
 	void InitSource(FVContext ctx, VIDEO_SOURCE_DESC desc);
 };
 
-static HVChroma AVCHAV(int avchroma)
+static HVChroma AVFmtChHAV(int avchroma, unsigned int &bitdepth)
 {
+	HVChroma hvChroma = HV_CHROMA_FORMAT_UNKNOWN;
+
 	switch (avchroma)
 	{
+	case AV_PIX_FMT_YUV420P10LE:
+	case AV_PIX_FMT_YUV420P12LE:
 	case AV_PIX_FMT_YUV420P:
-		return HV_CHROMA_FORMAT_420;
+		hvChroma = HV_CHROMA_FORMAT_420;
+		break;
+
+	case AV_PIX_FMT_YUV422P10LE:
+	case AV_PIX_FMT_YUV422P12LE:
 	case AV_PIX_FMT_YUV422P:
-		return HV_CHROMA_FORMAT_422;
+		hvChroma = HV_CHROMA_FORMAT_422;
+		break;
+
+	case AV_PIX_FMT_YUV444P10LE:
+	case AV_PIX_FMT_YUV444P12LE:
 	case AV_PIX_FMT_YUV444P:
-		return HV_CHROMA_FORMAT_444;
+		hvChroma = HV_CHROMA_FORMAT_444;
+		break;
 	default:
 		break;
 	}
+
+	switch (avchroma)
+	{
+	case AV_PIX_FMT_YUV420P:
+	case AV_PIX_FMT_YUV422P:
+	case AV_PIX_FMT_YUV444P:
+		bitdepth = 8;
+		break;
+
+	case AV_PIX_FMT_YUV420P10LE:
+	case AV_PIX_FMT_YUV422P10LE:
+	case AV_PIX_FMT_YUV444P10LE:
+		bitdepth = 10;
+		break;
+
+	case AV_PIX_FMT_YUV420P12LE:
+	case AV_PIX_FMT_YUV422P12LE:
+	case AV_PIX_FMT_YUV444P12LE:
+		bitdepth = 12;
+		break;
+
+	default:
+		break;
+	}
+
+	return hvChroma;
 }
 

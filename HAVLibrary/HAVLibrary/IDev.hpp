@@ -1,3 +1,4 @@
+#pragma once
 #include "IHAVComponent.hpp"
 
 // {D763242C-A1EC-4421-9B3C-06C391831AA2}

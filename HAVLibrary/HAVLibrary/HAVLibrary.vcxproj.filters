@@ -22,6 +22,9 @@
     <Filter Include="Private">
       <UniqueIdentifier>{4b755608-4450-4d06-b468-882648c42dde}</UniqueIdentifier>
     </Filter>
+    <Filter Include="CuKernels">
+      <UniqueIdentifier>{eadee72c-9666-4ee4-a45a-0e52dd09d059}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -40,6 +43,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="HAV.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NVFrame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -95,5 +101,16 @@
     <ClInclude Include="devNVIDIA.hpp">
       <Filter>Private</Filter>
     </ClInclude>
+    <ClInclude Include="NVFrame.hpp">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="hav_bgr_bgra.cuh">
+      <Filter>CuKernels</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="hav_bgr_bgra.cu">
+      <Filter>CuKernels</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

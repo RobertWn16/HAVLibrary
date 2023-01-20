@@ -15,7 +15,9 @@ winrt::hresult FFMPEGVideoSource::Parse(void* desc)
 			av_packet_unref(&av_pck);
 		if (SUCCEEDED(AVHr(av_read_frame(source_ctx.av_fmt_context, &av_pck)))) {
 			if (av_pck.stream_index == source_ctx.streamIndex) {
-				if (source_desc.codec == HV_CODEC_H264) {
+				if (source_desc.codec == HV_CODEC_H264 || source_desc.codec == HV_CODEC_H265_420 ||
+					source_desc.codec == HV_CODEC_VP9) {
+
 					if (flt_pck.data)
 						av_packet_unref(&flt_pck);
 					winrt::check_hresult(AVHr(av_bsf_send_packet(source_ctx.av_bsf_context, &av_pck)));
@@ -23,11 +25,13 @@ winrt::hresult FFMPEGVideoSource::Parse(void* desc)
 
 					pck_desc->data = flt_pck.data;
 					pck_desc->size = flt_pck.size;
+					pck_desc->timestamp = flt_pck.pts;
 
 					return S_OK;
 				}
 				pck_desc->data = av_pck.data;
 				pck_desc->size = av_pck.size;
+				pck_desc->timestamp = av_pck.pts;
 				return S_OK;
 			}
 		}
@@ -47,5 +51,6 @@ void FFMPEGVideoSource::InitSource(FVContext ctx, VIDEO_SOURCE_DESC source)
 	source_desc.width = source.width;
 	source_desc.heigth = source.heigth;
 	source_desc.chroma = source.chroma;
+	source_desc.format = source.format;
 	source_desc.bitdepth = source.bitdepth;
 }

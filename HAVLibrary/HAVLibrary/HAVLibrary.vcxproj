@@ -154,6 +154,7 @@
     <ClCompile Include="HAV.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NVDEC.cpp" />
+    <ClCompile Include="NVFrame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="devNVIDIA.hpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="HAV.hpp" />
     <ClInclude Include="HAVTypes.hpp" />
     <ClInclude Include="HAVUtilsPrivate.hpp" />
+    <ClInclude Include="hav_bgr_bgra.cuh" />
     <ClInclude Include="IDev.hpp" />
     <ClInclude Include="IFrame.hpp" />
     <ClInclude Include="IHAVComponent.hpp" />
@@ -172,7 +174,11 @@
     <ClInclude Include="IMuxer.hpp" />
     <ClInclude Include="IPresenter.hpp" />
     <ClInclude Include="NVDEC.hpp" />
+    <ClInclude Include="NVFrame.hpp" />
     <ClInclude Include="pch.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="hav_bgr_bgra.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
