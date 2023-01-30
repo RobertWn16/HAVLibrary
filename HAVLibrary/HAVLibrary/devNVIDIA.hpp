@@ -1,7 +1,7 @@
 #pragma once
 #include "IDev.hpp"
 #include <cuda.h>
-#include <dxgi1_3.h>
+#include <dxgi1_6.h>
 
 #pragma comment(lib, "dxgi")
 #pragma comment(lib, "windowscodecs")

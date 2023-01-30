@@ -10,6 +10,7 @@ private:
 	
 	void NV12_BGRX8(NVFrame* out, bool inverted, bool exAlpha = false, int value = 255);
 	void P016_BGRX8(NVFrame* out, bool inverted, bool exAlpha = false, int value = 255);
+	void PO16_BGRX16(NVFrame* out, unsigned int bitdepth, bool inverted, bool exAlpha = false, int value = 1023);
 public:
 	winrt::hresult GetDesc(FRAME_OUTPUT_DESC& desc);
 	winrt::hresult ConvertFormat(HVFormat fmt, IFrame *out);

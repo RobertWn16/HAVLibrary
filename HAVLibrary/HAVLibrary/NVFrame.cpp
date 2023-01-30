@@ -23,6 +23,8 @@ static double GetChannelFactor(HVFormat format)
 {
     switch (format)
     {
+    case HV_FORMAT_BGRA64_HDR10:
+        return 8.0f;
     case HV_FORMAT_RGBA8:
     case HV_FORMAT_BGRA32:
         return 4.0f;
@@ -47,8 +49,7 @@ void NVFrame::NV12_BGRX8(NVFrame* out, bool inverted, bool exAlpha, int value)
     npImage[0] = reinterpret_cast<unsigned char*>(cuFrame);
     npImage[1] = reinterpret_cast<unsigned char*>(cuFrame) + cuDesc.width * cuDesc.height;
 
-    hav_nv12_bgra32_SDR(npImage[0], npImage[1], cuDesc.width, cuDesc.height, reinterpret_cast<unsigned char*>(out->cuFrame), value, false);
-
+    hav_nv12_bgra32_SDR(npImage[0], npImage[1], cuDesc.width, cuDesc.height, false, 0.247138f, 0.0555243f, reinterpret_cast<unsigned char*>(out->cuFrame), true, 255.0f);
 }
 
 void NVFrame::P016_BGRX8(NVFrame* out, bool inverted, bool exAlpha, int value)
@@ -58,6 +59,16 @@ void NVFrame::P016_BGRX8(NVFrame* out, bool inverted, bool exAlpha, int value)
     npImage[1] = reinterpret_cast<unsigned short*>(cuFrame) + cuDesc.width * cuDesc.height;
 
     hav_p016_HDR10_bgra32_SDR(npImage[0], npImage[1], cuDesc.width, cuDesc.height, reinterpret_cast<unsigned char*>(out->cuFrame), value, false);
+}
+
+void NVFrame::PO16_BGRX16(NVFrame* out, unsigned int bitdepth, bool inverted, bool exAlpha, int alphaValue)
+{
+    unsigned short* npImage[2];
+    npImage[0] = reinterpret_cast<unsigned short*>(cuFrame);
+    npImage[1] = reinterpret_cast<unsigned short*>(cuFrame) + cuDesc.width * cuDesc.height;
+
+    hav_p016_HDR10_bgra64_HDR10_PQ_ACES(npImage[0], npImage[1], cuDesc.width, cuDesc.height, 0.0f, 2000.0f, 344.0f, 0.247138f, 0.0555243f,  reinterpret_cast<unsigned short*>(out->cuFrame), true, alphaValue);
+    //hav_p016_HDR10_bgra64_HDR10_Linear(npImage[0], npImage[1], cuDesc.width, cuDesc.height, false, 344.0f, 0.247138f, 0.0555243f ,reinterpret_cast<unsigned short*>(out->cuFrame), true, alphaValue);
 }
 
 winrt::hresult NVFrame::GetDesc(FRAME_OUTPUT_DESC& desc)
@@ -106,6 +117,9 @@ winrt::hresult NVFrame::ConvertFormat(HVFormat fmt, IFrame *out)
         case HV_FORMAT_BGRA32:
             P016_BGRX8(dynamic_cast<NVFrame*>(out), false, true, 255);
             break;
+        case HV_FORMAT_BGRA64_HDR10:
+            PO16_BGRX16(dynamic_cast<NVFrame*>(out), false, true, 1023);
+            break;
         default:
             break;
         }
@@ -138,7 +152,7 @@ winrt::hresult NVFrame::CommitResource()
     } catch (winrt::hresult_error const& err) {
         return err.code();
     }
-
+    
     return S_OK;
 }
 

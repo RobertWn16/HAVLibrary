@@ -173,12 +173,13 @@
     <ClInclude Include="IHAV.hpp" />
     <ClInclude Include="IMuxer.hpp" />
     <ClInclude Include="IPresenter.hpp" />
+    <ClInclude Include="LUTS.cuh" />
     <ClInclude Include="NVDEC.hpp" />
     <ClInclude Include="NVFrame.hpp" />
     <ClInclude Include="pch.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="hav_bgr_bgra.cu" />
+    <CudaCompile Include="ColorSpaceConversion.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

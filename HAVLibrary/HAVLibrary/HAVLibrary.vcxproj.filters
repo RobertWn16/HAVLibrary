@@ -107,9 +107,12 @@
     <ClInclude Include="hav_bgr_bgra.cuh">
       <Filter>CuKernels</Filter>
     </ClInclude>
+    <ClInclude Include="LUTS.cuh">
+      <Filter>CuKernels</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="hav_bgr_bgra.cu">
+    <CudaCompile Include="ColorSpaceConversion.cu">
       <Filter>CuKernels</Filter>
     </CudaCompile>
   </ItemGroup>

@@ -17,10 +17,10 @@ winrt::hresult DevNVIDIA::InitDevice(DEV_DESC dev_desc)
         if (desc.VendorId == nv_desc.vendor) {
             if (nvidia_adpt == nv_desc.ordinal) {
 
+
                 winrt::check_hresult(cuInit(0));
                 cuDeviceGet(&cuDevice, nv_desc.ordinal);
                 cuCtxCreate(&cuContext, 0, cuDevice);
-
                 dxgi_adpt->Release();
                 break;
             }
