@@ -104,7 +104,7 @@
     <ClInclude Include="NVFrame.hpp">
       <Filter>Private</Filter>
     </ClInclude>
-    <ClInclude Include="hav_bgr_bgra.cuh">
+    <ClInclude Include="ColorSpaceConversion.cuh">
       <Filter>CuKernels</Filter>
     </ClInclude>
     <ClInclude Include="LUTS.cuh">

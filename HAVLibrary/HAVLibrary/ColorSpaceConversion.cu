@@ -1,4 +1,4 @@
-#include "hav_bgr_bgra.cuh"
+#include "ColorSpaceConversion.cuh"
 #include "LUTS.cuh"
 #include <stdint.h>
 #include <cuda_runtime.h>
@@ -7,15 +7,13 @@
 #include <device_launch_parameters.h>
 
 constexpr float SDR_NITS = 80.0f;
-__device__ float a = 2.51f;
-__device__ float b = 0.03f;
-__device__ float c = 2.43f;
-__device__ float d = 0.59f;
-__device__ float e = 0.14f;
-__device__ float ACESFilm(float x)
-{
-	return x * (a * x + b) / (x * (c * x + d) + e);
-}
+
+//ACES curve constants
+__device__ float aces_a = 2.51f;
+__device__ float aces_b = 0.03f;
+__device__ float aces_c = 2.43f;
+__device__ float aces_d = 0.59f;
+__device__ float aces_e = 0.14f;
 
 template<class T>
 __device__ static T Clamp(T x, T lower, T upper) {
@@ -95,9 +93,9 @@ __global__ void p016_HDR10_bgra64_HDR10_PQ_ACES_kernel(unsigned short* cuLuma,
 		G_FP32 = (max_content_luminance * EOTF_LUT[(int)G_FP32]) / SDR_NITS;
 		B_FP32 = (max_content_luminance * EOTF_LUT[(int)B_FP32]) / SDR_NITS;
 
-		R_FP32 = R_FP32 * (a * R_FP32 + b) / (R_FP32 * (c * R_FP32 + d) + e) * display_lum_coeff;
-		G_FP32 = G_FP32 * (a * G_FP32 + b) / (G_FP32 * (c * G_FP32 + d) + e) * display_lum_coeff;
-		B_FP32 = B_FP32 * (a * B_FP32 + b) / (B_FP32 * (c * B_FP32 + d) + e) * display_lum_coeff;
+		R_FP32 = R_FP32 * (aces_a * R_FP32 + aces_b) / (R_FP32 * (aces_c * R_FP32 + aces_d) + aces_e) * display_lum_coeff;
+		G_FP32 = G_FP32 * (aces_a * G_FP32 + aces_b) / (G_FP32 * (aces_c * G_FP32 + aces_d) + aces_e) * display_lum_coeff;
+		B_FP32 = B_FP32 * (aces_a * B_FP32 + aces_b) / (B_FP32 * (aces_c * B_FP32 + aces_d) + aces_e) * display_lum_coeff;
 
 		destImage[pitchFactor * i + 0] = __float2half(R_FP32).operator __half_raw().x;
 		destImage[pitchFactor * i + 1] = __float2half(G_FP32).operator __half_raw().x;

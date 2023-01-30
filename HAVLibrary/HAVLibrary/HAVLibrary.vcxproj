@@ -163,7 +163,7 @@
     <ClInclude Include="HAV.hpp" />
     <ClInclude Include="HAVTypes.hpp" />
     <ClInclude Include="HAVUtilsPrivate.hpp" />
-    <ClInclude Include="hav_bgr_bgra.cuh" />
+    <ClInclude Include="ColorSpaceConversion.cuh" />
     <ClInclude Include="IDev.hpp" />
     <ClInclude Include="IFrame.hpp" />
     <ClInclude Include="IHAVComponent.hpp" />

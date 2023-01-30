@@ -1,5 +1,5 @@
 #include "NVFrame.hpp"
-#include "hav_bgr_bgra.cuh"
+#include "ColorSpaceConversion.cuh"
 #include <fstream>
 constexpr unsigned int RGB_NO_OF_CHANNELS = 3;
 
