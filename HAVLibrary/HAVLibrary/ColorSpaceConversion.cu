@@ -124,7 +124,8 @@ __global__ void p016_HDR10_bgra64_HDR10_PQ_Reinhard_kernel(unsigned short* cuLum
 	float white_black_coeff,
 	unsigned short* destImage,
 	bool exAlpha,
-	unsigned int alpha)
+	unsigned int alpha
+)
 {
 	unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
 	unsigned int stride = blockDim.x * gridDim.x;
@@ -210,7 +211,8 @@ __global__ void p016_HDR10_bgra64_HDR10_Linear_kernel(unsigned short* cuLuma,
 	float white_black_coeff,
 	unsigned short* destImage,
 	bool exAlpha,
-	unsigned int alpha)
+	unsigned int alpha
+)
 {
 	unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
 	unsigned int stride = blockDim.x * gridDim.x;
@@ -268,6 +270,81 @@ __global__ void p016_HDR10_bgra64_HDR10_Linear_kernel(unsigned short* cuLuma,
 		if (exAlpha)
 			destImage[pitchFactor * i + 3] = A_FP32.operator __half_raw().x;
 	}
+	return;
+}
+
+__global__ void p016_HDR10_bgra32_SDR_Linear_kernel(unsigned short* cuLuma,
+	unsigned short* cuChroma,
+	unsigned int width,
+	unsigned int heigth,
+	bool inverted,
+	float wr,
+	float wb,
+	float wg,
+	float wgb,
+	float wgr,
+	float wr_coef,
+	float wb_coef,
+	float white_black_coeff,
+	unsigned char* destImage,
+	bool exAlpha,
+	unsigned int alpha
+)
+{
+	unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
+	unsigned int stride = blockDim.x * gridDim.x;
+	int resolution = width * heigth;
+	unsigned int pitch = width;
+	unsigned int pitchFactor = 3;
+
+	unsigned int shift_depth = 8;
+	unsigned int Y_offset = 16;
+	unsigned int UV_offset = 128;
+	if (exAlpha)
+		pitchFactor = 4;
+	
+	int maxValue = 255;
+
+	int Y = 0;
+	int U = 0;
+	int V = 0;
+
+	float R_FP32 = 0.0f;
+	float G_FP32 = 0.0f;
+	float B_FP32 = 0.0f;
+
+	for (int i = index; i < resolution; i += stride)
+	{
+		unsigned int curRow = i / width;
+		unsigned int curColumn = i - curRow * width;
+		unsigned int u_idx = curRow / 2 * width + curColumn;
+		u_idx -= u_idx & 1;
+		unsigned int v_idx = u_idx + 1;
+
+
+		Y = (cuLuma[i] >> shift_depth) - Y_offset;
+		U = (cuChroma[u_idx] >> shift_depth) - UV_offset;
+		V = (cuChroma[v_idx] >> shift_depth) - UV_offset;
+
+		R_FP32 = (Y + wr_coef * V) * white_black_coeff;
+		B_FP32 = (Y + wb_coef * U) * white_black_coeff;
+		G_FP32 = ((Y - wr * R_FP32 - wb * B_FP32) / wg) * white_black_coeff;
+
+		if (inverted) {
+			destImage[pitchFactor * i + 0] = Clamp((int)R_FP32, 0, maxValue); // Limited RGB Saturation
+			destImage[pitchFactor * i + 1] = Clamp((int)G_FP32, 0, maxValue);
+			destImage[pitchFactor * i + 2] = Clamp((int)B_FP32, 0, maxValue);
+		}
+		else {
+			destImage[pitchFactor * i + 2] = Clamp((int)R_FP32, 0, maxValue); // Limited RGB Saturation
+			destImage[pitchFactor * i + 1] = Clamp((int)G_FP32, 0, maxValue);
+			destImage[pitchFactor * i + 0] = Clamp((int)B_FP32, 0, maxValue);
+		}
+
+		if (exAlpha)
+			destImage[pitchFactor * i + 3] = alpha;
+	}
+
 	return;
 }
 
@@ -378,64 +455,6 @@ void hav_nv12_bgra32_SDR(unsigned char* SDRLuma,
 		rgbImage,
 		true,
 		alpha);
-}
-
-void hav_p016_bgra64(unsigned short* cuLuma,
-	unsigned short* cuChroma,
-	unsigned int width,
-	unsigned int heigth,
-	unsigned char* destImage,
-	bool inverted,
-	bool exAlpha, 
-	unsigned int alpha)
-{
-		
-}
-
-void hav_p016_HDR10_bgr32_SDR(unsigned short* HDRLuma,
-	unsigned short* HDRChroma,
-	unsigned int p016Width, 
-	unsigned int p016Height,
-	unsigned char* rgbImage,
-	bool inverted)
-{
-	
-}
-
-void hav_p016_HDR10_bgr64_HDR10(unsigned short* cuLuma,
-	unsigned short* cuChroma,
-	unsigned int p016Width,
-	unsigned int p016Height,
-	unsigned short* rgbImage,
-	bool inverted)
-{
-
-}
-
-void hav_p016_HDR10_bgra32_SDR(unsigned short* HDRLuma,
-	unsigned short* HDRChroma,
-	unsigned int p016Width,
-	unsigned int p016Height, 
-	unsigned char* rgbImage,
-	unsigned short alpha,
-	bool inverted
-)
-{
-
-}
-
-void hav_p016_HDR10_bgra64_HDR10(unsigned short* HDRLuma,
-	unsigned short* HDRChroma,
-	unsigned int p016Width,
-	unsigned int p016Height,
-	unsigned short* rgbImage,
-	bool useFP16,
-	unsigned int nits,
-	bool inverted,
-	unsigned short alpha
-)
-{
-
 }
 
 void hav_p016_HDR10_bgra64_HDR10_PQ_ACES(unsigned short* HDRLuma, 
@@ -559,3 +578,43 @@ void hav_p016_HDR10_bgra64_HDR10_Linear(unsigned short* HDRLuma,
 		exAlpha,
 		alpha);
 }
+
+void hav_p016_HDR10_bgra32_SDR_Linear(unsigned short* cuLuma,
+	unsigned short* cuChroma,
+	unsigned int width,
+	unsigned int heigth,
+	bool inverted,
+	float wr,
+	float wb,
+	unsigned char* destImage,
+	bool exAlpha,
+	unsigned int alpha
+)
+{
+	float wg = 1.0f - wr - wb;
+	float wgb = -wb * (1.0f - wb) / 0.5f / (1 - wb - wr);
+	float wgr = -wr * (1 - wr) / 0.5f / (1 - wb - wr);
+	float white_black_coeff = 1.16f;
+
+	float wr_coef = (1.0f - wr) / 0.5f;
+	float wb_coef = (1.0f - wb) / 0.5f;
+
+	p016_HDR10_bgra32_SDR_Linear_kernel << <1240, 360 >> > (cuLuma,
+		cuChroma,
+		width,
+		heigth,
+		inverted,
+		wr,
+		wb,
+		wg,
+		wgb,
+		wgr,
+		wr_coef,
+		wb_coef,
+		white_black_coeff,
+		destImage,
+		exAlpha,
+		alpha
+	);
+}
+

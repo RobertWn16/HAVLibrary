@@ -12,6 +12,13 @@ struct FRAME_OUTPUT_DESC
 	unsigned int width;
 	unsigned int height;
 	HVFormat format;
+	HVColorSpace colorspace;
+	float wr;
+	float wb;
+	HVTransfer transfer;
+	HVToneMapper tone_mapper;
+	float max_content_luminance;
+	float display_luminance;
 };
 class __declspec(uuid("78FB1499-1525-4C9F-91F1-6239AE57A897")) IFrame : public IUnknown
 {

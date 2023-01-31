@@ -58,17 +58,7 @@ void NVFrame::P016_BGRX8(NVFrame* out, bool inverted, bool exAlpha, int value)
     npImage[0] = reinterpret_cast<unsigned short*>(cuFrame);
     npImage[1] = reinterpret_cast<unsigned short*>(cuFrame) + cuDesc.width * cuDesc.height;
 
-    hav_p016_HDR10_bgra32_SDR(npImage[0], npImage[1], cuDesc.width, cuDesc.height, reinterpret_cast<unsigned char*>(out->cuFrame), value, false);
-}
-
-void NVFrame::PO16_BGRX16(NVFrame* out, unsigned int bitdepth, bool inverted, bool exAlpha, int alphaValue)
-{
-    unsigned short* npImage[2];
-    npImage[0] = reinterpret_cast<unsigned short*>(cuFrame);
-    npImage[1] = reinterpret_cast<unsigned short*>(cuFrame) + cuDesc.width * cuDesc.height;
-
-    hav_p016_HDR10_bgra64_HDR10_PQ_ACES(npImage[0], npImage[1], cuDesc.width, cuDesc.height, 0.0f, 2000.0f, 344.0f, 0.247138f, 0.0555243f,  reinterpret_cast<unsigned short*>(out->cuFrame), true, alphaValue);
-    //hav_p016_HDR10_bgra64_HDR10_Linear(npImage[0], npImage[1], cuDesc.width, cuDesc.height, false, 344.0f, 0.247138f, 0.0555243f ,reinterpret_cast<unsigned short*>(out->cuFrame), true, alphaValue);
+    
 }
 
 winrt::hresult NVFrame::GetDesc(FRAME_OUTPUT_DESC& desc)
@@ -88,17 +78,20 @@ winrt::hresult NVFrame::ConvertFormat(HVFormat fmt, IFrame *out)
     if (out_frame_desc.format == cuDesc.format)
         return E_INVALIDARG;
 
+    NVFrame* nv_out = dynamic_cast<NVFrame*>(out);
+    if (!nv_out)
+        return E_INVALIDARG;
+
+    unsigned short* np_16u_Image[2];
+    unsigned char* np_8u_Image[2];
     if (cuDesc.format == HV_FORMAT_NV12) {
         switch (out_frame_desc.format)
         {
-        case HV_FORMAT_RGBA8:
-            NV12_BGRX8(dynamic_cast<NVFrame*>(out), true, true);
-            break;
-        case HV_FORMAT_RGB8:
-            NV12_BGRX8(dynamic_cast<NVFrame*>(out), true);
-            break;
         case HV_FORMAT_BGRA32:
-            NV12_BGRX8(dynamic_cast<NVFrame*>(out), false, true, 255);
+            np_8u_Image[0] = reinterpret_cast<unsigned char*>(cuFrame);
+            np_8u_Image[1] = reinterpret_cast<unsigned char*>(cuFrame) + cuDesc.width * cuDesc.height;
+            hav_nv12_bgra32_SDR(np_8u_Image[0], np_8u_Image[1], cuDesc.width, cuDesc.height, false, 
+                cuDesc.wr, cuDesc.wb, reinterpret_cast<unsigned char*>(nv_out->cuFrame), true, 255.0f);
             break;
         case HV_FORMAT_NV12:
             break;
@@ -115,10 +108,26 @@ winrt::hresult NVFrame::ConvertFormat(HVFormat fmt, IFrame *out)
         switch (out_frame_desc.format)
         {
         case HV_FORMAT_BGRA32:
-            P016_BGRX8(dynamic_cast<NVFrame*>(out), false, true, 255);
+            np_16u_Image[0] = reinterpret_cast<unsigned short*>(cuFrame);
+            np_16u_Image[1] = reinterpret_cast<unsigned short*>(cuFrame) + cuDesc.width * cuDesc.height;
+            hav_p016_HDR10_bgra32_SDR_Linear(np_16u_Image[0], np_16u_Image[1], cuDesc.width, cuDesc.height,
+                false, cuDesc.wr, cuDesc.wb, reinterpret_cast<unsigned char*>(nv_out->cuFrame), true, 0.0f);
             break;
         case HV_FORMAT_BGRA64_HDR10:
-            PO16_BGRX16(dynamic_cast<NVFrame*>(out), false, true, 1023);
+            np_16u_Image[0] = reinterpret_cast<unsigned short*>(cuFrame);
+            np_16u_Image[1] = reinterpret_cast<unsigned short*>(cuFrame) + cuDesc.width * cuDesc.height;
+            if (cuDesc.transfer == HV_TRANSFER_PQ) {
+                if (cuDesc.tone_mapper == HV_TONE_MAPPER_ACES)
+                    hav_p016_HDR10_bgra64_HDR10_PQ_ACES(np_16u_Image[0], np_16u_Image[1],
+                        cuDesc.width, cuDesc.height, false, cuDesc.max_content_luminance, cuDesc.display_luminance,
+                        cuDesc.wr, cuDesc.wb, reinterpret_cast<unsigned short*>(nv_out->cuFrame), true, 0.0f);
+
+                if (cuDesc.tone_mapper == HV_TONE_MAPPER_REINHARD_EXT)
+                    hav_p016_HDR10_bgra64_HDR10_PQ_Reinhard(np_16u_Image[0], np_16u_Image[1],
+                        cuDesc.width, cuDesc.height, false, cuDesc.max_content_luminance, cuDesc.display_luminance,
+                        cuDesc.wr, cuDesc.wb, reinterpret_cast<unsigned short*>(nv_out->cuFrame), true, 0.0f);
+
+            }
             break;
         default:
             break;
@@ -166,6 +175,25 @@ winrt::hresult NVFrame::ConfigureFrame(FRAME_OUTPUT_DESC desc)
     try {
         winrt::check_hresult(CUDAHr(cudaMalloc((void**)&cuFrame, GetChannelFactor(desc.format) * desc.width * desc.height)));
         winrt::check_pointer(&cuFrame);
+
+        cuDesc.colorspace = desc.colorspace;
+        switch (desc.colorspace)
+        {
+        case HV_COLORSPACE_BT601:
+            cuDesc.wr = 0.299f; cuDesc.wb = 0.114f;
+            break;
+        case HV_COLORSPACE_BT709:
+            cuDesc.wr = 0.2126f; cuDesc.wr = 0.0722f;
+            break;
+        case HV_COLORSPACE_BT2020:
+            cuDesc.wr = 0.2627f; cuDesc.wb = 0.0593f;
+            break;
+        case HV_COLORSPACE_CUSTOM:
+            cuDesc.wr = desc.wr; cuDesc.wb = desc.wb;
+            break;
+        default:
+            break;
+        }
     }catch (winrt::hresult_error const& err) {
         return err.code();
     }
