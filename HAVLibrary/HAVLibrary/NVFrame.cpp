@@ -73,7 +73,7 @@ winrt::hresult NVFrame::ConvertFormat(HVFormat fmt, IFrame *out)
             np_8u_Image[0] = reinterpret_cast<unsigned char*>(cuFrame);
             np_8u_Image[1] = reinterpret_cast<unsigned char*>(cuFrame) + cuDesc.width * cuDesc.height;
             hav_nv12_bgra32_SDR(np_8u_Image[0], np_8u_Image[1], cuDesc.width, cuDesc.height, false, 
-                cuDesc.wr, cuDesc.wb, reinterpret_cast<unsigned char*>(nv_out->cuFrame), true, 255.0f);
+                content_Colorimetry_XYZ[1][0], content_Colorimetry_XYZ[1][2], reinterpret_cast<unsigned char*>(nv_out->cuFrame), true, 255.0f);
             break;
         case HV_FORMAT_NV12:
             break;
@@ -93,7 +93,7 @@ winrt::hresult NVFrame::ConvertFormat(HVFormat fmt, IFrame *out)
             np_16u_Image[0] = reinterpret_cast<unsigned short*>(cuFrame);
             np_16u_Image[1] = reinterpret_cast<unsigned short*>(cuFrame) + cuDesc.width * cuDesc.height;
             hav_p016_HDR10_bgra32_SDR_Linear(np_16u_Image[0], np_16u_Image[1], cuDesc.width, cuDesc.height,
-                false, cuDesc.wr, cuDesc.wb, reinterpret_cast<unsigned char*>(nv_out->cuFrame), true, 0.0f);
+                false, content_Colorimetry_XYZ[1][0], content_Colorimetry_XYZ[1][2], reinterpret_cast<unsigned char*>(nv_out->cuFrame), true, 0.0f);
             break;
         case HV_FORMAT_BGRA64_HDR10:
             np_16u_Image[0] = reinterpret_cast<unsigned short*>(cuFrame);
@@ -110,8 +110,8 @@ winrt::hresult NVFrame::ConvertFormat(HVFormat fmt, IFrame *out)
             }
 
             if (cuDesc.transfer == HV_TRANSFER_LINEAR) {
-                hav_p016_HDR10_bgra64_HDR10_Linear(np_16u_Image[0], np_16u_Image[1],
-                    cuDesc.width, cuDesc.height, false, cuDesc.display_luminance, cuDesc.wr, cuDesc.wb, reinterpret_cast<unsigned short*>(nv_out->cuFrame), true, 0.0f);
+                /*hav_p016_HDR10_bgra64_HDR10_Linear(np_16u_Image[0], np_16u_Image[1],
+                    cuDesc.width, cuDesc.height, false, cuDesc.display_luminance, C, cuDesc.wb, reinterpret_cast<unsigned short*>(nv_out->cuFrame), true, 0.0f);*/
             }
             break;
         default:

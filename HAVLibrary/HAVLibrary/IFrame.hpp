@@ -14,8 +14,6 @@ struct FRAME_OUTPUT_DESC
 	HVFormat format;
 	HVColorSpace content_colorspace;
 	HVColorimetry content_colorimetry;
-	float wr;
-	float wb;
 	HVTransfer transfer;
 	HVToneMapper tone_mapper;
 	HVColorSpace display_colorspace;

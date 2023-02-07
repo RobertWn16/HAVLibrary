@@ -445,15 +445,15 @@ __global__ void nv12_SDR_bgra32_SDR_kernel(unsigned char* cuLuma,
 
 	if (exAlpha)
 		pitchFactor = 4;
-	int maxValue = 255.0f;
+	int maxValue = 255;
 
 	int Y = 0;
 	int U = 0;
 	int V = 0;
 
-	float R_FP32 = 0.0f;
-	float G_FP32 = 0.0f;
-	float B_FP32 = 0.0f;
+	int R_FP32 = 0;
+	int G_FP32 = 0;
+	int B_FP32 = 0;
 
 	for (int i = index; i < resolution; i += stride)
 	{
@@ -473,14 +473,14 @@ __global__ void nv12_SDR_bgra32_SDR_kernel(unsigned char* cuLuma,
 		G_FP32 = ((Y - wr * R_FP32 - wb * B_FP32) / wg) * white_black_coeff;
 	
 		if (inverted) {
-			destImage[pitchFactor * i + 0] = Clamp((int)R_FP32, 0, maxValue); // Limited RGB Saturation
-			destImage[pitchFactor * i + 1] = Clamp((int)G_FP32, 0, maxValue);
-			destImage[pitchFactor * i + 2] = Clamp((int)B_FP32, 0, maxValue);
+			destImage[pitchFactor * i + 0] = Clamp(R_FP32, 0, maxValue); // Limited RGB Saturation
+			destImage[pitchFactor * i + 1] = Clamp(G_FP32, 0, maxValue);
+			destImage[pitchFactor * i + 2] = Clamp(B_FP32, 0, maxValue);
 		}
 		else {
-			destImage[pitchFactor * i + 2] = Clamp((int)R_FP32, 0, maxValue); // Limited RGB Saturation
-			destImage[pitchFactor * i + 1] = Clamp((int)G_FP32, 0, maxValue);
-			destImage[pitchFactor * i + 0] = Clamp((int)B_FP32, 0, maxValue);
+			destImage[pitchFactor * i + 2] = Clamp(R_FP32, 0, maxValue); // Limited RGB Saturation
+			destImage[pitchFactor * i + 1] = Clamp(G_FP32, 0, maxValue);
+			destImage[pitchFactor * i + 0] = Clamp(B_FP32, 0, maxValue);
 		}
 
 		if (exAlpha)
@@ -504,13 +504,13 @@ void hav_nv12_bgra32_SDR(unsigned char* SDRLuma,
 {
 	float wg = 1 - wr - wb;
 	float wgb = -wb * (1.0f - wb) / 0.5f / (1 - wb - wr);
-	float wgr = -wr * (1 - wr) / 0.5f / (1 - wb - wr);
-	float white_black_coeff = 1.16f;
+	float wgr = -wr * (1.0f - wr) / 0.5f / (1 - wb - wr);
+	float white_black_coeff = 1.11f;
 
 	float wr_coef = (1.0f - wr) / 0.5f;
 	float wb_coef = (1.0f - wb) / 0.5f;
 
-	nv12_SDR_bgra32_SDR_kernel << <320, 180 >> > (SDRLuma,
+	nv12_SDR_bgra32_SDR_kernel << <1240, 360 >> > (SDRLuma,
 		SDRChroma,
 		width,
 		heigth,
@@ -638,8 +638,8 @@ void hav_p016_HDR10_bgra64_HDR10_Linear(unsigned short* HDRLuma,
 	unsigned int alpha)
 {
 	float wg = 1.0f - wr - wb;
-	float wgb = -wb * (1.0f - wb) / 0.5f / (1 - wb - wr);
-	float wgr = -wr * (1 - wr) / 0.5f / (1 - wb - wr);
+	float wgb = -wb * (1.0f - wb) / 0.5f / (1 - wg);
+	float wgr = -wr * (1 - wr) / 0.5f / (1 - wg);
 	float white_black_coeff = 1.16f;
 
 	float wr_coef = (1.0f - wr) / 0.5f;
@@ -677,8 +677,8 @@ void hav_p016_HDR10_bgra32_SDR_Linear(unsigned short* cuLuma,
 )
 {
 	float wg = 1.0f - wr - wb;
-	float wgb = -wb * (1.0f - wb) / 0.5f / (1 - wb - wr);
-	float wgr = -wr * (1 - wr) / 0.5f / (1 - wb - wr);
+	float wgb = -wb * (1.0f - wb) / 0.5f / (1 - wg);
+	float wgr = -wr * (1 - wr) / 0.5f / (1 - wg);
 	float white_black_coeff = 1.16f;
 
 	float wr_coef = (1.0f - wr) / 0.5f;

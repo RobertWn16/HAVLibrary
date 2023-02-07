@@ -39,6 +39,7 @@ static HVColorSpace AVcsHAVcs(AVColorPrimaries av_primaries)
 	case AVCOL_PRI_RESERVED0:
 
 		break;
+	case AVCOL_PRI_UNSPECIFIED:
 	case AVCOL_PRI_BT709:
 		return HV_COLORSPACE_BT709;
 		break;

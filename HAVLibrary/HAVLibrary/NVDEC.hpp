@@ -12,6 +12,7 @@ private:
 	std::mutex cuLock;
 	std::queue<CUdeviceptr> cuBuffer;
 	CUdeviceptr dec_bkbuffer = 0;
+	unsigned int surfaceHeigth = 0;
 
 	static int parser_decode_picture_callback(void* pUser, CUVIDPICPARAMS* pic);
 	static int parser_sequence_callback(void* pUser, CUVIDEOFORMAT* fmt);

@@ -187,6 +187,7 @@ int NVDEC::parser_sequence_callback(void* pUser, CUVIDEOFORMAT* fmt)
     create_info.ulTargetHeight = fmt->coded_height;
     create_info.ulWidth = fmt->coded_width;
     create_info.ulHeight = fmt->coded_height;
+    self->surfaceHeigth = fmt->coded_height;
 
     winrt::check_hresult(CUHr(cuCtxSetCurrent(self->deviceContext)));
     winrt::check_hresult(CUHr(cuvidCreateDecoder(&self->cuDecoder, &create_info)));
@@ -234,7 +235,7 @@ int NVDEC::parser_display_picture_callback(void* pUser, CUVIDPARSERDISPINFO* inf
         m.WidthInBytes = m.dstPitch;
         m.Height = video_desc.heigth;
         winrt::check_hresult(CUHr(cuMemcpy2D(&m)));
-        m.srcDevice = dec_frame + m.srcPitch * video_desc.heigth;
+        m.srcDevice = dec_frame + m.srcPitch * self->surfaceHeigth;
         m.dstDevice = self->dec_bkbuffer + m.dstPitch * video_desc.heigth;
         m.Height = video_desc.heigth / 2;
         winrt::check_hresult(CUHr(cuMemcpy2D(&m)));
