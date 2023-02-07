@@ -15,7 +15,7 @@ enum Vendor
 struct DEV_DESC
 {
 	unsigned int ordinal;
-	Vendor vendor;
+	Vendor vendor = Intel;
 	std::string DeviceName;
 };
 

@@ -71,6 +71,20 @@ static cudaVideoChromaFormat HAVCHNV(int havchroma)
     }
 }
 
+NVDEC::~NVDEC()
+{
+    cuCtxPushCurrent(deviceContext);
+
+    if (cuParser)
+       cuvidDestroyVideoParser(cuParser);
+    if (cuDecoder)
+       cuvidDestroyDecoder(cuDecoder);
+    if (dec_bkbuffer)
+       cudaFree(reinterpret_cast<void*>(dec_bkbuffer));
+
+    cuCtxPopCurrent(nullptr);
+}
+
 winrt::hresult NVDEC::CreateParser(VIDEO_SOURCE_DESC desc)
 {
     CUVIDPARSERPARAMS cuParserParams = { };

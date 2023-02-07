@@ -1,5 +1,11 @@
 #include "DevNVIDIA.hpp"
 
+DevNVIDIA::~DevNVIDIA()
+{
+    if(cuContext)
+        cuCtxDestroy(cuContext);
+}
+
 winrt::hresult DevNVIDIA::InitDevice(DEV_DESC dev_desc)
 {
     try

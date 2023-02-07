@@ -7,7 +7,6 @@ struct FVContext
 {
 public:
 	AVFormatContext* av_fmt_context = nullptr;
-	AVInputFormat* av_inp_format = nullptr;
 	AVBSFContext* av_bsf_context = nullptr;
 	const AVBitStreamFilter* av_bsf_filter = nullptr;
 	unsigned int streamIndex = 0;
@@ -16,19 +15,20 @@ public:
 
 struct FFMPEGVideoSource : winrt::implements<FFMPEGVideoSource, IVideoSource>
 {
-public:
+private:
 	IDecoder* source_decoder;
 	AVPacket av_pck;
 	AVPacket flt_pck;
 	FVContext source_ctx;
-	VIDEO_SOURCE_DESC source_desc;
 	bool sync;
 
 public:
+	VIDEO_SOURCE_DESC source_desc;
+
+	~FFMPEGVideoSource();
+
 	winrt::hresult GetDesc(VIDEO_SOURCE_DESC &desc) final;
 	winrt::hresult Parse(void* desc) final;
-
-public:
 	void InitSource(FVContext ctx, VIDEO_SOURCE_DESC desc);
 };
 

@@ -215,6 +215,12 @@ winrt::hresult NVFrame::ConfigureFrame(FRAME_OUTPUT_DESC desc)
     return S_OK;
 }
 
+NVFrame::~NVFrame()
+{
+    if(cuFrame)
+        cudaFree(reinterpret_cast<void*>(cuFrame));
+}
+
 winrt::hresult NVFrame::ComputeColorimetryMatrix(HVColorimetry in_colorimetry, float XYZ[3][3], float XYZ_Inverse[3][3])
 {
     float ref_white_inv[3][3];

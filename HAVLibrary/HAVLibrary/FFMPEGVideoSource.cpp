@@ -1,5 +1,15 @@
 #include "FFMPEGVideoSource.hpp"
 #include <iostream>
+FFMPEGVideoSource::~FFMPEGVideoSource()
+{
+	if (av_pck.data)
+		av_packet_unref(&av_pck);
+	if (flt_pck.data)
+		av_packet_unref(&flt_pck);
+	if (source_ctx.av_fmt_context)
+		avformat_close_input(&source_ctx.av_fmt_context);
+
+}
 winrt::hresult FFMPEGVideoSource::GetDesc(VIDEO_SOURCE_DESC& desc)
 {
 	desc = source_desc;
@@ -41,7 +51,6 @@ winrt::hresult FFMPEGVideoSource::Parse(void* desc)
 void FFMPEGVideoSource::InitSource(FVContext ctx, VIDEO_SOURCE_DESC source)
 {
 	source_ctx.av_fmt_context = ctx.av_fmt_context;
-	source_ctx.av_inp_format = ctx.av_inp_format;
 	source_ctx.av_bsf_context = ctx.av_bsf_context;
 	source_ctx.vstream = ctx.vstream;
 

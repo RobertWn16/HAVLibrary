@@ -36,6 +36,7 @@ struct THREAD_PARAMS
 {
     HWND hwnd;
     std::string name;
+    bool windowIsClosed = false;
 };
 void DecodeMainLoop(THREAD_PARAMS par)
 {
@@ -138,13 +139,12 @@ void DecodeMainLoop(THREAD_PARAMS par)
         tex_desc.Usage = D3D11_USAGE_DEFAULT;
 
         hr = pd3d11_dev->CreateTexture2D(&tex_bkbuffer, nullptr, &pd3d11_cuda_shresource);
-
         pd3d11_bkbuffer->Release();
     }
 
     winrt::check_hresult(rgba_frame->RegisterD3D11Resource(pd3d11_cuda_shresource));
 
-    while (true) {
+    while (!par.windowIsClosed) {
         try {
             SYSTEMTIME start, stop;
             GetSystemTime(&start);
@@ -160,7 +160,7 @@ void DecodeMainLoop(THREAD_PARAMS par)
             pd3d11_bkbuffer->Release();
         }
         catch (winrt::hresult_error const& err) {
-
+            std::cout << err.code();
         }
     }
 }
@@ -274,4 +274,7 @@ int main(int argc, char** argv)
         TranslateMessage(&Msg);
         DispatchMessage(&Msg);
     }
+
+    par.windowIsClosed = true;
+    WaitForSingleObject(par.hwnd, INFINITE);
 }

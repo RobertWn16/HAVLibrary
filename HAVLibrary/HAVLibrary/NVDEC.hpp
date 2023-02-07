@@ -13,17 +13,16 @@ private:
 	std::queue<CUdeviceptr> cuBuffer;
 	CUdeviceptr dec_bkbuffer = 0;
 
-public:
-	winrt::hresult IsSupported(VIDEO_SOURCE_DESC desc) final;
-	winrt::hresult Decode(IFrame *out) final;
-
-	winrt::hresult CreateParser(VIDEO_SOURCE_DESC desc);
-
-private:
 	static int parser_decode_picture_callback(void* pUser, CUVIDPICPARAMS* pic);
 	static int parser_sequence_callback(void* pUser, CUVIDEOFORMAT* fmt);
 	static int parser_display_picture_callback(void* pUser, CUVIDPARSERDISPINFO* info);
 	static int parser_get_operation_point_callback(void* pUser, CUVIDOPERATINGPOINTINFO* opInfo);
+
+public:
+	~NVDEC();
+	winrt::hresult IsSupported(VIDEO_SOURCE_DESC desc) final;
+	winrt::hresult Decode(IFrame *out) final;
+	winrt::hresult CreateParser(VIDEO_SOURCE_DESC desc);
 
 public:
 	IVideoSource* vSource;
