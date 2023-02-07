@@ -23,7 +23,8 @@ enum HVChroma
 
 enum HVFormat
 {
-	HV_FORMAT_RGBA8 = 0,
+	HV_FORMAT_UNKNOWN = 0,
+	HV_FORMAT_RGBA8,
 	HV_FORMAT_RGB8,
 	HV_FORMAT_BGRA32,
 	HV_FORMAT_BGRA64_HDR10,
@@ -39,6 +40,7 @@ enum HVColorSpace
 	HV_COLORSPACE_BT709,
 	HV_COLORSPACE_ADOBE_RGB,
 	HV_COLORSPACE_BT2020,
+	HV_COLORSPACE_DISPLAY_P3,
 	HV_COLORSPACE_CUSTOM
 };
 
@@ -63,3 +65,20 @@ enum HAVError
 	E_HV_ALREADY_LINKED = E_HV_NOT_LINKED + 1,
 	E_HV_CODEC_NOT_SUPPORTED = E_HV_ALREADY_LINKED + 1,
 };
+
+struct HVColorimetry
+{
+	float xr;
+	float yr;
+	float xg;
+	float yg;
+	float xb;
+	float yb;
+	float xw;
+	float yw;
+};
+
+const HVColorimetry BT601_Colorimetry_625lines = { .xr = 0.640f, .yr = 0.630, .xg = 0.290, .yg = 0.600f, .xb = 0.15f, .yb = 0.060f, .xw = 0.3127f, .yw = 0.3290 };
+const HVColorimetry BT709_Colorimetry = { .xr = 0.64f, .yr = 0.33f, .xg = 0.3f, .yg = 0.6f, .xb = 0.15f, .yb = 0.06f, .xw = 0.3127f, .yw = 0.3290f};
+const HVColorimetry BT2020_Colorimetry = { .xr = 0.708f, .yr = 0.292f, .xg = 0.170f, .yg = 0.797f, .xb = 0.131f, .yb = 0.046f, .xw = 0.3127f, .yw = 0.3290f };
+const HVColorimetry DisplayP3_Colorimetry = { .xr = 0.680f, .yr = 0.320f, .xg = 0.265f, .yg = 0.690f, .xb = 0.150f, .yb = 0.060f, .xw = 0.3127f, .yw = 0.3290f };

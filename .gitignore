@@ -12,3 +12,5 @@ HAVLibrary/HAVLibrary/sample.hevc
 HAVLibrary/HAVLibrary/sample.p016
 HAVLibrary/HAVLibrary/sample.rgb
 HAVLibrary/HAVLibrary/lgdemo.ts
+*.p016
+*.mp4

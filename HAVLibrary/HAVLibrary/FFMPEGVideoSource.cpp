@@ -45,12 +45,5 @@ void FFMPEGVideoSource::InitSource(FVContext ctx, VIDEO_SOURCE_DESC source)
 	source_ctx.av_bsf_context = ctx.av_bsf_context;
 	source_ctx.vstream = ctx.vstream;
 
-	source_desc.codec = source.codec;
-	source_desc.duration = source.duration;
-	source_desc.framerate = source.framerate;
-	source_desc.width = source.width;
-	source_desc.heigth = source.heigth;
-	source_desc.chroma = source.chroma;
-	source_desc.format = source.format;
-	source_desc.bitdepth = source.bitdepth;
+	source_desc = source;
 }

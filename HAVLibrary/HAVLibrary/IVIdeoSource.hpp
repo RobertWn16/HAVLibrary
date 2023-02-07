@@ -13,9 +13,17 @@ struct VIDEO_SOURCE_DESC
 	HVCodec codec;
 	HVChroma chroma;
 	HVFormat format;
+	HVColorSpace colorspace;
+	HVTransfer transfer;
 	unsigned int bitdepth;
 	unsigned int width;
 	unsigned int heigth;
+
+	//HDR Metadata
+	float max_content_luminance;
+	float avg_content_luminance;
+	float MaxCLL;
+	float MaxFALL;
 };
 
 class __declspec(uuid("3E0E196D-A155-431F-AFA1-1BDA94298955")) IVideoSource : public IHAVComponent

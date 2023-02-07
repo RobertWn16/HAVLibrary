@@ -7,10 +7,11 @@ struct NVFrame : winrt::implements<NVFrame, IFrame>
 {
 private:
 	cudaGraphicsResource* cuResource;
-	
-	void NV12_BGRX8(NVFrame* out, bool inverted, bool exAlpha = false, int value = 255);
-	void P016_BGRX8(NVFrame* out, bool inverted, bool exAlpha = false, int value = 255);
-	void PO16_BGRX16(NVFrame* out, unsigned int bitdepth, bool inverted, bool exAlpha = false, int value = 1023);
+	float content_Colorimetry_XYZ[3][3];
+	float content_Colorimetry_XYZ_Inverse[3][3];
+	float display_Colorimetry_XYZ[3][3];
+	float display_Colrimetry_XYZ_Inverse[3][3];
+	float Colorimetry_Convertor[3][3];
 public:
 	winrt::hresult GetDesc(FRAME_OUTPUT_DESC& desc);
 	winrt::hresult ConvertFormat(HVFormat fmt, IFrame *out);
@@ -23,4 +24,9 @@ public:
 	CUdeviceptr cuFrame;
 	unsigned int cuFrameSize;
 	cudaArray_t resourceArray = nullptr;
+
+private:
+	winrt::hresult ComputeColorimetryMatrix(HVColorimetry in_colorimetry, float XYZ[3][3], float XYZ_Inverse[3][3]);
+	void ComputeMatrixInverse(float mat[3][3], float mat_inv[3][3]);
+
 };

@@ -7,7 +7,7 @@ winrt::hresult HAV::Link(IHAVComponent* In, IHAVComponent* Out)
         NVDEC* nv_decoder = dynamic_cast<NVDEC*>(Out);
         if (nv_decoder) {
             if (!nv_decoder->hasDevice) {
-                nv_decoder->deviceContext = dev_nvidia->cuContext;
+                nv_decoder->deviceContext = dev_nvidia->GetContext();
                 nv_decoder->hasDevice = true;
                 return S_OK;
             }

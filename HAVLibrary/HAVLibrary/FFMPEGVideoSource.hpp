@@ -32,6 +32,42 @@ public:
 	void InitSource(FVContext ctx, VIDEO_SOURCE_DESC desc);
 };
 
+static HVColorSpace AVcsHAVcs(AVColorPrimaries av_primaries)
+{
+	switch (av_primaries)
+	{
+	case AVCOL_PRI_RESERVED0:
+
+		break;
+	case AVCOL_PRI_BT709:
+		return HV_COLORSPACE_BT709;
+		break;
+	case AVCOL_PRI_BT2020:
+		return HV_COLORSPACE_BT2020;
+		break;
+	default:
+		break;
+	}
+
+	return HV_COLORSPACE_UNKNOWN;
+}
+static HVTransfer AVTrHAVTransfer(AVColorTransferCharacteristic av_transfer)
+{
+	switch (av_transfer)
+	{
+	case AVCOL_TRC_UNSPECIFIED:
+		return HV_TRANSFER_UNKNOWN;
+		break;
+	case AVCOL_TRC_SMPTE2084:
+		return HV_TRANSFER_PQ;
+		break;
+	case AVCOL_TRC_ARIB_STD_B67:
+		return HV_TRANSFER_HLG;
+		break;
+	default:
+		break;
+	}
+}
 static HVChroma AVFmtChHAV(int avchroma, unsigned int &bitdepth)
 {
 	HVChroma hvChroma = HV_CHROMA_FORMAT_UNKNOWN;

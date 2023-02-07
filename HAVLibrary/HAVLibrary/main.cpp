@@ -81,7 +81,7 @@ void DecodeMainLoop(THREAD_PARAMS par)
     winrt::com_ptr<IDecoder> dec;
     winrt::com_ptr<IFrame> nv_frame;
     winrt::com_ptr<IFrame> rgba_frame;
-
+    cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync);
     VIDEO_SOURCE_DESC vsrc_desc = { 0 };
     try {
         winrt::check_hresult(hav_instance->CreateDecoder(IID_HAV_NVDEC, dec.put()));
@@ -96,20 +96,19 @@ void DecodeMainLoop(THREAD_PARAMS par)
         frame_desc.format = vsrc_desc.format;
         frame_desc.width = vsrc_desc.width;
         frame_desc.height = vsrc_desc.heigth;
-        frame_desc.colorspace = HV_COLORSPACE_BT709;
-        frame_desc.wr = 0.247138f;
-        frame_desc.wb = 0.0555243f;
+        frame_desc.content_colorspace = vsrc_desc.colorspace;
+        frame_desc.display_colorspace = HV_COLORSPACE_DISPLAY_P3;
         frame_desc.transfer = HV_TRANSFER_PQ;
         frame_desc.tone_mapper = HV_TONE_MAPPER_ACES;
-        frame_desc.max_content_luminance = 1000.0f;
-        frame_desc.display_luminance = 334.0f;
+        frame_desc.max_content_luminance = vsrc_desc.max_content_luminance;
+        frame_desc.display_luminance = 344.0f;
 
         winrt::check_hresult(hav_instance->CreateFrame(IID_HAV_NVFrame, frame_desc, nv_frame.put()));
 
-        frame_desc.format = HV_FORMAT_BGRA32;
+        frame_desc.format = HV_FORMAT_BGRA64_HDR10;
         winrt::check_hresult(hav_instance->CreateFrame(IID_HAV_NVFrame, frame_desc, rgba_frame.put()));
 
-        hr = pdxgi_swpch->ResizeBuffers(3, vsrc_desc.width, vsrc_desc.heigth, DXGI_FORMAT_B8G8R8A8_UNORM, 0);
+        hr = pdxgi_swpch->ResizeBuffers(3, vsrc_desc.width, vsrc_desc.heigth, DXGI_FORMAT_R16G16B16A16_FLOAT, 0);
     }
     catch (winrt::hresult_error const& err) {
         std::cout << "Error 0x%x" << err.code();
@@ -129,7 +128,7 @@ void DecodeMainLoop(THREAD_PARAMS par)
         hr = pdxgi_swpch->QueryInterface(&spwch);
         hr = spwch->SetColorSpace1(DXGI_COLOR_SPACE_RGB_FULL_G10_NONE_P709);
         D3D11_TEXTURE2D_DESC tex_desc = { 0 };
-        tex_desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+        tex_desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
         tex_desc.ArraySize = 1;
         tex_desc.MipLevels = 1;
         tex_desc.SampleDesc.Count = 1;
@@ -147,15 +146,18 @@ void DecodeMainLoop(THREAD_PARAMS par)
 
     while (true) {
         try {
+            SYSTEMTIME start, stop;
+            GetSystemTime(&start);
             winrt::check_hresult(dec->Decode(nv_frame.get()));
             winrt::check_hresult(nv_frame->ConvertFormat(HV_FORMAT_RGBA8, rgba_frame.get()));
             winrt::check_hresult(rgba_frame->CommitResource());
-
+            cudaDeviceSynchronize();
+            GetSystemTime(&stop);
+            std::cout << stop.wMilliseconds - start.wMilliseconds << std::endl;
            if (SUCCEEDED(hr)) hr = pdxgi_swpch->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pd3d11_bkbuffer);
             pd3d11_ctx->CopyResource(pd3d11_bkbuffer, pd3d11_cuda_shresource);
             pdxgi_swpch->Present(1, 0);
             pd3d11_bkbuffer->Release();
-
         }
         catch (winrt::hresult_error const& err) {
 
@@ -258,7 +260,7 @@ int main(int argc, char** argv)
     THREAD_PARAMS par;
 
     par.hwnd = core_hwnd;
-    par.name = "lgcolor.mkv";
+    par.name = "world.mkv";
     CreateThread(nullptr,
         0,
         reinterpret_cast<LPTHREAD_START_ROUTINE>(DecodeMainLoop),

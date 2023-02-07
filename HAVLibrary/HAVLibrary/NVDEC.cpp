@@ -225,9 +225,6 @@ int NVDEC::parser_display_picture_callback(void* pUser, CUVIDPARSERDISPINFO* inf
         m.Height = video_desc.heigth / 2;
         winrt::check_hresult(CUHr(cuMemcpy2D(&m)));
 
-        /**self->cuLock.lock();
-        self->cuBuffer.push(self->dec_bkbuffer);
-        self->cuLock.unlock();*/
     }
 
     winrt::check_hresult(CUHr(cuvidUnmapVideoFrame(self->cuDecoder, dec_frame)));

@@ -8,13 +8,13 @@
 
 struct DevNVIDIA : winrt::implements<DevNVIDIA, IDev>
 {
+private:
+	CUdevice cuDevice;
+	CUcontext cuContext;
 public:
 	winrt::hresult InitDevice(DEV_DESC dev_desc);
 	winrt::hresult GetDesc(DEV_DESC& desc) final;
-
 public:
-	CUdevice cuDevice;
-	CUcontext cuContext;
 	DEV_DESC nv_desc;
 	CUdevice GetDevice();
 	CUcontext GetContext();
