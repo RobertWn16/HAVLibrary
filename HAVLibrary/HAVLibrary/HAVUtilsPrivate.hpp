@@ -45,6 +45,8 @@ static HVCodec AVCOHAV(int avcodec)
 		return HV_CODEC_H265_420;
 	case AV_CODEC_ID_AV1:
 		return HV_CODEC_AV1;
+	case AV_CODEC_ID_MJPEG:
+		return HV_CODEC_MJPEG;
 	default:
 		break;
 	}

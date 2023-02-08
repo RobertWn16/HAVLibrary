@@ -53,6 +53,8 @@ static cudaVideoCodec HAVCONV(int havcodec)
         return cudaVideoCodec_HEVC;
     case HV_CODEC_AV1:
         return cudaVideoCodec_AV1;
+    case HV_CODEC_MJPEG:
+        return cudaVideoCodec_JPEG;
     default:
         break;
     }
