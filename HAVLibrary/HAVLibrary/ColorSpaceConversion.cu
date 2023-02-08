@@ -157,10 +157,6 @@ __global__ void p016_HDR10_bgra64_HDR10_PQ_ACES_kernel(unsigned short* cuLuma,
 	return;
 }
 
-__device__ float ApplySRGBCurve_Fast(float x)
-{
-	return x < 0.0031308 ? 12.92 * x : 1.13005 * sqrt(x - 0.00228) - 0.13448 * x + 0.005719;
-}
 __global__ void p016_HDR10_bgra64_HDR10_PQ_Reinhard_kernel(unsigned short* cuLuma,
 	unsigned short* cuChroma,
 	unsigned int width,

@@ -260,8 +260,8 @@ int main(int argc, char** argv)
     THREAD_PARAMS par;
 
     par.hwnd = core_hwnd;
-    par.name = "bunny.mp4";
-    CreateThread(nullptr,
+    par.name = "rtsp://admin:1q2w3e4r@192.168.1.6/ch1/main/av_stream";
+    HANDLE hThread = CreateThread(nullptr,
         0,
         reinterpret_cast<LPTHREAD_START_ROUTINE>(DecodeMainLoop),
         &par,
@@ -276,5 +276,5 @@ int main(int argc, char** argv)
     }
 
     par.windowIsClosed = true;
-    WaitForSingleObject(par.hwnd, INFINITE);
+    WaitForSingleObject(hThread, INFINITE);
 }

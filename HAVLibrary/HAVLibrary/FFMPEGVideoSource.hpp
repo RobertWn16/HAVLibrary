@@ -78,6 +78,7 @@ static HVChroma AVFmtChHAV(int avchroma, unsigned int &bitdepth)
 	case AV_PIX_FMT_YUV420P10LE:
 	case AV_PIX_FMT_YUV420P12LE:
 	case AV_PIX_FMT_YUV420P:
+	case AV_PIX_FMT_YUVJ420P:
 		hvChroma = HV_CHROMA_FORMAT_420;
 		break;
 
@@ -99,6 +100,7 @@ static HVChroma AVFmtChHAV(int avchroma, unsigned int &bitdepth)
 	switch (avchroma)
 	{
 	case AV_PIX_FMT_YUV420P:
+	case AV_PIX_FMT_YUVJ420P:
 	case AV_PIX_FMT_YUV422P:
 	case AV_PIX_FMT_YUV444P:
 		bitdepth = 8;

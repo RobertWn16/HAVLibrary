@@ -8,6 +8,8 @@
 #include <initguid.h>
 #include <iostream>
 
+#define HAV_LOG L"[HAVLog]: "
+
 // {B4016E7D-1222-4B3A-B1FC-E228F7EF181D}
 DEFINE_GUID(IID_HAV_NVDev,
 	0xb4016e7d, 0x1222, 0x4b3a, 0xb1, 0xfc, 0xe2, 0x28, 0xf7, 0xef, 0x18, 0x1d);

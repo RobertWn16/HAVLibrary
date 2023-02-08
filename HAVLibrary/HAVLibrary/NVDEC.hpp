@@ -16,7 +16,7 @@ private:
 
 	static int parser_decode_picture_callback(void* pUser, CUVIDPICPARAMS* pic);
 	static int parser_sequence_callback(void* pUser, CUVIDEOFORMAT* fmt);
-	static int parser_display_picture_callback(void* pUser, CUVIDPARSERDISPINFO* info);
+	static int parser_display_picture_callback(void* pUser, CUVIDPARSERDISPINFO* info) noexcept;
 	static int parser_get_operation_point_callback(void* pUser, CUVIDOPERATINGPOINTINFO* opInfo);
 
 public:

@@ -75,12 +75,20 @@ NVDEC::~NVDEC()
 {
     cuCtxPushCurrent(deviceContext);
 
-    if (cuParser)
-       cuvidDestroyVideoParser(cuParser);
-    if (cuDecoder)
-       cuvidDestroyDecoder(cuDecoder);
-    if (dec_bkbuffer)
-       cudaFree(reinterpret_cast<void*>(dec_bkbuffer));
+    if (cuParser) {
+        cuvidDestroyVideoParser(cuParser);
+        cuParser = nullptr;
+    }
+
+    if (cuDecoder) {
+        cuvidDestroyDecoder(cuDecoder);
+        cuParser = nullptr;
+    }
+
+    if (dec_bkbuffer) {
+        cudaFree(reinterpret_cast<void*>(dec_bkbuffer));
+        cuParser = nullptr;
+    }
 
     cuCtxPopCurrent(nullptr);
 }
@@ -195,55 +203,62 @@ int NVDEC::parser_sequence_callback(void* pUser, CUVIDEOFORMAT* fmt)
 
     return create_info.ulNumDecodeSurfaces;
 }
-int NVDEC::parser_display_picture_callback(void* pUser, CUVIDPARSERDISPINFO* info)
+int NVDEC::parser_display_picture_callback(void* pUser, CUVIDPARSERDISPINFO* info) noexcept
 {
-    NVDEC* self = reinterpret_cast<NVDEC*>(pUser);
-    winrt::check_pointer(self);
+    try
+    {
+        NVDEC* self = reinterpret_cast<NVDEC*>(pUser);
+        winrt::check_pointer(self);
 
-    VIDEO_SOURCE_DESC video_desc = { 0 };
-    CUdeviceptr dec_frame = 0;
-    unsigned int pitch = 0;
+        VIDEO_SOURCE_DESC video_desc = { 0 };
+        CUdeviceptr dec_frame = 0;
+        unsigned int pitch = 0;
 
-    CUVIDPROCPARAMS vpp = { 0 };
-    vpp.progressive_frame = info->progressive_frame;
-    vpp.top_field_first = info->top_field_first;
-    vpp.unpaired_field = (info->repeat_first_field < 0);
-    vpp.second_field = info->repeat_first_field + 1;
+        CUVIDPROCPARAMS vpp = { 0 };
+        vpp.progressive_frame = info->progressive_frame;
+        vpp.top_field_first = info->top_field_first;
+        vpp.unpaired_field = (info->repeat_first_field < 0);
+        vpp.second_field = info->repeat_first_field + 1;
 
-    CUVIDGETDECODESTATUS stat;
-    bool checkState = false;
-    if (video_desc.codec == HV_CODEC_H264 || video_desc.codec == HV_CODEC_H265_420) {
-        checkState = true;
-        winrt::check_hresult(CUHr(cuvidGetDecodeStatus(self->cuDecoder, info->picture_index, &stat)));
+        winrt::check_pointer(self->cuDecoder);
+        winrt::check_pointer(self->deviceContext);
+
+        CUVIDGETDECODESTATUS stat;
+        bool checkState = false;
+        if (video_desc.codec == HV_CODEC_H264 || video_desc.codec == HV_CODEC_H265_420) {
+            checkState = true;
+            winrt::check_hresult(CUHr(cuvidGetDecodeStatus(self->cuDecoder, info->picture_index, &stat)));
+        }
+        winrt::check_hresult(CUHr(cuCtxSetCurrent(self->deviceContext)));
+        winrt::check_hresult(CUHr(cuvidMapVideoFrame(self->cuDecoder, info->picture_index, &dec_frame, &pitch, &vpp)));
+
+        if (!checkState || stat.decodeStatus == cuvidDecodeStatus_Success || stat.decodeStatus == cuvidDecodeStatus_InProgress) {
+            winrt::check_hresult(self->vSource->GetDesc(video_desc));
+            unsigned int cellSize = (video_desc.bitdepth - 8);
+            cellSize = (cellSize) ? cellSize : 1;
+
+            CUDA_MEMCPY2D m = { 0 };
+            m.srcMemoryType = CU_MEMORYTYPE_DEVICE;
+            m.srcDevice = dec_frame;
+            m.srcPitch = pitch;
+            m.dstMemoryType = CU_MEMORYTYPE_DEVICE;
+            m.dstDevice = self->dec_bkbuffer;
+            m.dstPitch = cellSize * video_desc.width;
+            m.WidthInBytes = m.dstPitch;
+            m.Height = video_desc.heigth;
+            winrt::check_hresult(CUHr(cuMemcpy2D(&m)));
+            m.srcDevice = dec_frame + m.srcPitch * self->surfaceHeigth;
+            m.dstDevice = self->dec_bkbuffer + m.dstPitch * video_desc.heigth;
+            m.Height = video_desc.heigth / 2;
+            winrt::check_hresult(CUHr(cuMemcpy2D(&m)));
+
+        }
+        winrt::check_hresult(CUHr(cuvidUnmapVideoFrame(self->cuDecoder, dec_frame)));
+        winrt::check_hresult(CUHr(cuCtxSetCurrent(nullptr)));
+
+    } catch (winrt::hresult_error const& err) {
+        std::wcout << HAV_LOG << "DisplayPictureCallback " << err.message().c_str() << std::endl;
     }
-
-    winrt::check_hresult(CUHr(cuCtxSetCurrent(self->deviceContext)));
-    winrt::check_hresult(CUHr(cuvidMapVideoFrame(self->cuDecoder, info->picture_index, &dec_frame, &pitch, &vpp)));
-
-    if (!checkState || stat.decodeStatus == cuvidDecodeStatus_Success || stat.decodeStatus == cuvidDecodeStatus_InProgress) {
-        winrt::check_hresult(self->vSource->GetDesc(video_desc));
-        unsigned int cellSize = (video_desc.bitdepth - 8);
-        cellSize = (cellSize) ? cellSize : 1;
-
-        CUDA_MEMCPY2D m = {0};
-        m.srcMemoryType = CU_MEMORYTYPE_DEVICE;
-        m.srcDevice = dec_frame;
-        m.srcPitch = pitch;
-        m.dstMemoryType = CU_MEMORYTYPE_DEVICE;
-        m.dstDevice = self->dec_bkbuffer;
-        m.dstPitch = cellSize * video_desc.width;
-        m.WidthInBytes = m.dstPitch;
-        m.Height = video_desc.heigth;
-        winrt::check_hresult(CUHr(cuMemcpy2D(&m)));
-        m.srcDevice = dec_frame + m.srcPitch * self->surfaceHeigth;
-        m.dstDevice = self->dec_bkbuffer + m.dstPitch * video_desc.heigth;
-        m.Height = video_desc.heigth / 2;
-        winrt::check_hresult(CUHr(cuMemcpy2D(&m)));
-
-    }
-
-    winrt::check_hresult(CUHr(cuvidUnmapVideoFrame(self->cuDecoder, dec_frame)));
-    winrt::check_hresult(CUHr(cuCtxSetCurrent(nullptr)));
 
     return 0;
 }
