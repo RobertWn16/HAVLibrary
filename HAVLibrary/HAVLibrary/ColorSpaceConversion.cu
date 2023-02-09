@@ -495,6 +495,26 @@ __global__ void nv12_SDR_bgra32_SDR_kernel(unsigned char* cuLuma,
 	return;
 }
 
+__global__ void bgr24_bgra32_kernel(unsigned char* srcImage,
+	unsigned int width,
+	unsigned int heigth,
+	unsigned int alpha,
+	unsigned char* destImage
+)
+{
+	unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
+	unsigned int stride = blockDim.x * gridDim.x;
+	unsigned int resolution = width * heigth;
+	for (unsigned int i = index; i < width * heigth; i += stride)
+	{
+		destImage[4 * i + 0] = srcImage[i * 3 + 0];
+		destImage[4 * i + 1] = srcImage[i * 3 + 1];
+		destImage[4 * i + 2] = srcImage[i * 3 + 2];
+		destImage[4 * i + 3] = Clamp((int)alpha, 0, 255);
+	}
+}
+
+
 void hav_nv12_bgra32_SDR(unsigned char* SDRLuma,
 	unsigned char* SDRChroma,
 	unsigned int width,
@@ -706,5 +726,11 @@ void hav_p016_HDR10_bgra32_SDR_Linear(unsigned short* cuLuma,
 		exAlpha,
 		alpha
 	);
+}
+
+void hav_bgr24_bgra32_SDR(unsigned char* bgr, unsigned int width, unsigned int height, unsigned int alpha, unsigned char* bgra)
+{
+	bgr24_bgra32_kernel << <320, 180 >> > (bgr, width, height, alpha, bgra);
+
 }
 

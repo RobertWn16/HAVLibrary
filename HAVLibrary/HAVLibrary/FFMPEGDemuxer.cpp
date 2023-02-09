@@ -35,7 +35,10 @@ winrt::hresult FFMPEGDemuxer::VideoCapture(std::string path, IVideoSource** sour
 	stream_info.chroma = AVFmtChHAV(new_context.vstream->codecpar->format, stream_info.bitdepth);
 	stream_info.transfer = AVTrHAVTransfer(new_context.vstream->codecpar->color_trc);
 	stream_info.colorspace = AVcsHAVcs(new_context.vstream->codecpar->color_primaries);
-	stream_info.format = (stream_info.bitdepth - 8) ? HV_FORMAT_P016 : HV_FORMAT_NV12;
+	if (stream_info.codec == HV_CODEC_MJPEG)
+		stream_info.format = HV_FORMAT_BGR24;
+	else
+		stream_info.format = (stream_info.bitdepth - 8) ? HV_FORMAT_P016 : HV_FORMAT_NV12;
 
 	for (int i = 0; i < new_context.vstream->nb_side_data; i++) {
 

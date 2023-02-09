@@ -24,6 +24,7 @@ static winrt::hresult CUDAHr(cudaError_t cudaErr)
     return S_OK;
 }
 
+
 static winrt::hresult CUHr(CUresult cuRes)
 {
     if (cuRes != CUDA_SUCCESS)
@@ -121,6 +122,9 @@ winrt::hresult NVDEC::CreateParser(VIDEO_SOURCE_DESC desc)
 
 winrt::hresult NVDEC::IsSupported(VIDEO_SOURCE_DESC desc)
 {
+    if (desc.codec == HV_CODEC_MJPEG)
+        return E_HV_CODEC_NOT_SUPPORTED;
+
     CUVIDDECODECAPS dec_caps;
     dec_caps.eCodecType = HAVCONV(desc.codec);
     dec_caps.eChromaFormat = HAVCHNV(desc.chroma);

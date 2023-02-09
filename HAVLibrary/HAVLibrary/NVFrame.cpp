@@ -1,19 +1,12 @@
 #include "NVFrame.hpp"
 #include "ColorSpaceConversion.cuh"
 #include <fstream>
+
 constexpr unsigned int RGB_NO_OF_CHANNELS = 3;
 
 static winrt::hresult CUDAHr(cudaError_t cudaErr)
 {
     if (cudaErr < cudaSuccess)
-        return E_FAIL;
-
-    return S_OK;
-}
-
-static winrt::hresult CUHr(CUresult cuRes)
-{
-    if (cuRes != CUDA_SUCCESS)
         return E_FAIL;
 
     return S_OK;
@@ -29,6 +22,7 @@ static double GetChannelFactor(HVFormat format)
     case HV_FORMAT_BGRA32:
         return 4.0f;
         break;
+    case HV_FORMAT_BGR24:
     case HV_FORMAT_RGB8:
         return 3.0f;
         break;
@@ -113,6 +107,22 @@ winrt::hresult NVFrame::ConvertFormat(HVFormat fmt, IFrame *out)
                 /*hav_p016_HDR10_bgra64_HDR10_Linear(np_16u_Image[0], np_16u_Image[1],
                     cuDesc.width, cuDesc.height, false, cuDesc.display_luminance, C, cuDesc.wb, reinterpret_cast<unsigned short*>(nv_out->cuFrame), true, 0.0f);*/
             }
+            break;
+        default:
+            break;
+        }
+    }
+
+    unsigned char* bgr = nullptr;
+    unsigned char* bgra = nullptr;
+    if (cuDesc.format == HV_FORMAT_BGR24)
+    {
+        switch (out_frame_desc.format)
+        {
+        case HV_FORMAT_BGRA32:
+            bgr = reinterpret_cast<unsigned char*>(cuFrame);
+            bgra = reinterpret_cast<unsigned char*>(nv_out->cuFrame);
+            hav_bgr24_bgra32_SDR(bgr, cuDesc.width, cuDesc.height, 255, bgra);
             break;
         default:
             break;

@@ -155,6 +155,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NVDEC.cpp" />
     <ClCompile Include="NVFrame.cpp" />
+    <ClCompile Include="NVJpegDecoder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="devNVIDIA.hpp" />
@@ -176,6 +177,7 @@
     <ClInclude Include="LUTS.cuh" />
     <ClInclude Include="NVDEC.hpp" />
     <ClInclude Include="NVFrame.hpp" />
+    <ClInclude Include="NVJpegDecoder.hpp" />
     <ClInclude Include="pch.hpp" />
   </ItemGroup>
   <ItemGroup>

@@ -1,3 +1,4 @@
+#pragma once
 #include "IFrame.hpp"
 #include "HAVUtilsPrivate.hpp"
 #include <d3d11.h>

@@ -48,6 +48,9 @@
     <ClCompile Include="NVFrame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="NVJpegDecoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IMuxer.hpp">
@@ -109,6 +112,9 @@
     </ClInclude>
     <ClInclude Include="LUTS.cuh">
       <Filter>CuKernels</Filter>
+    </ClInclude>
+    <ClInclude Include="NVJpegDecoder.hpp">
+      <Filter>Private</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -65,3 +65,10 @@ void hav_p016_HDR10_bgra32_SDR_Linear(unsigned short* cuLuma,
 	bool exAlpha,
 	unsigned int alpha
 );
+
+void hav_bgr24_bgra32_SDR(unsigned char* bgr,
+	unsigned int width,
+	unsigned int height,
+	unsigned int alpha,
+	unsigned char* bgra
+);

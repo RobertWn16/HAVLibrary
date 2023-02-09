@@ -16,6 +16,7 @@ extern "C"
 #pragma comment(lib, "nvcuvid")
 #pragma comment(lib, "cuda")
 
+
 static winrt::hresult AVHr(int avcode)
 {
 	char buf[BUFSIZ];

@@ -2,6 +2,7 @@
 #include "NVDEC.hpp"
 #include "DevNVIDIA.hpp"
 #include "FFMPEGDemuxer.hpp"
+#include "NVJpegDecoder.hpp"
 
 struct HAV : winrt::implements<HAV, IHAV>
 {

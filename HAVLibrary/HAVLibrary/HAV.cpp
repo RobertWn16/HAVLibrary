@@ -32,6 +32,13 @@ winrt::hresult HAV::Link(IHAVComponent* In, IHAVComponent* Out)
             else
                 return E_HV_ALREADY_LINKED;
         }
+        NVJpegDecoder* nvjpeg_decoder = dynamic_cast<NVJpegDecoder*>(Out);
+        if (nvjpeg_decoder) {
+                winrt::check_hresult(nvjpeg_decoder->IsSupported(ffmpeg_source->source_desc));
+                winrt::check_hresult(nvjpeg_decoder->CreateNVJpeg(ffmpeg_source->source_desc));
+                nvjpeg_decoder->vSource = ffmpeg_source;
+                return S_OK;
+        }
         return E_INVALIDARG;
     }
 
@@ -49,7 +56,6 @@ winrt::hresult __stdcall HAV::CreateDevice(REFIID iid, DEV_DESC dev_desc, IDev**
             winrt::check_hresult(dev_ptr->InitDevice(dev_desc));
             *Out = dev_ptr.get();
             dev_ptr.detach();
-
             return S_OK;
         }
         catch (winrt::hresult_error const& err) {
@@ -70,7 +76,6 @@ winrt::hresult __stdcall HAV::CreateDemuxer(REFIID iid, IDemuxer** Out)
             winrt::check_pointer(demx_ptr.get());
             *Out = demx_ptr.get();
             demx_ptr.detach();
-
             return S_OK;
         }catch (winrt::hresult_error const& err) {
             return err.code();
@@ -91,9 +96,23 @@ winrt::hresult __stdcall HAV::CreateDecoder(REFIID iid, IDecoder** Out)
             winrt::check_pointer(dec_ptr.get());
             *Out = dec_ptr.get();
             dec_ptr.detach();
-
             return S_OK;
         }catch(winrt::hresult_error const& err) {
+            return err.code();
+        }
+    }
+
+    if (IsEqualIID(iid, IID_HAV_NVJpegDecoder))
+    {
+        try {
+            winrt::check_pointer(Out);
+            dec_ptr = winrt::make_self<NVJpegDecoder>();
+            winrt::check_pointer(dec_ptr.get());
+            *Out = dec_ptr.get();
+            dec_ptr.detach();
+            return S_OK;
+        }
+        catch (winrt::hresult_error const& err) {
             return err.code();
         }
     }
@@ -113,7 +132,6 @@ winrt::hresult __stdcall HAV::CreateFrame(REFIID iid, FRAME_OUTPUT_DESC frame_de
             frame_ptr->cuDesc = frame_desc;
             *Out = frame_ptr.get();
             frame_ptr.detach();
-            
             return S_OK;
         }
         catch (winrt::hresult_error const& err) {

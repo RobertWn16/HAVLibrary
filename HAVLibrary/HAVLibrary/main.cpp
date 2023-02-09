@@ -4,6 +4,7 @@
 #pragma comment (lib, "d3d11")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxguid.lib")
+
 D3D_FEATURE_LEVEL levels[] = {
 D3D_FEATURE_LEVEL_11_0,
 D3D_FEATURE_LEVEL_11_1
@@ -38,7 +39,8 @@ struct THREAD_PARAMS
     std::string name;
     bool windowIsClosed = false;
 };
-void DecodeMainLoop(THREAD_PARAMS par)
+
+void DecodeMain(IDecoder* dec, THREAD_PARAMS &par,  VIDEO_SOURCE_DESC vsrc_desc) noexcept
 {
     HRESULT hr = S_OK;
     D3D11_VIEWPORT m_viewport = {  };
@@ -49,12 +51,14 @@ void DecodeMainLoop(THREAD_PARAMS par)
     ID3D11Texture2D* pd3d11_bkbuffer = nullptr;
     ID3D11Texture2D* pd3d11_cuda_shresource = nullptr;
 
+    winrt::com_ptr<IFrame> nv_frame;
+    winrt::com_ptr<IFrame> rgba_frame;
+
     //DXGISWPCH Garbage
     DXGI_SWAP_CHAIN_DESC1 dxgi_desc = { };
     DXGI_SWAP_CHAIN_FULLSCREEN_DESC dxgi_desc_fs = { };
 
     IDXGISwapChain1* pdxgi_swpch = nullptr;
-
 
     if (SUCCEEDED(hr))
     {
@@ -71,50 +75,30 @@ void DecodeMainLoop(THREAD_PARAMS par)
         dxgi_desc_fs.Scaling = DXGI_MODE_SCALING_STRETCHED;
         dxgi_desc_fs.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_PROGRESSIVE;
         dxgi_desc_fs.Windowed = true;
-        
+
         hr = pdxgi_fty->CreateSwapChainForHwnd(pd3d11_dev, par.hwnd, &dxgi_desc, NULL, NULL, &pdxgi_swpch);
         DXGI_RGBA rgba = { };
         rgba.a = 255;
         pdxgi_swpch->SetBackgroundColor(&rgba);
     }
 
-    winrt::com_ptr<IVideoSource> source;
-    winrt::com_ptr<IDecoder> dec;
-    winrt::com_ptr<IFrame> nv_frame;
-    winrt::com_ptr<IFrame> rgba_frame;
-    cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync);
-    VIDEO_SOURCE_DESC vsrc_desc = { 0 };
-    try {
-        winrt::check_hresult(hav_instance->CreateDecoder(IID_HAV_NVDEC, dec.put()));
-        winrt::check_hresult(demx->VideoCapture(par.name.c_str(), source.put()));
-        winrt::check_hresult(hav_instance->Link(dev_nvidia.get(), dec.get()));
+    FRAME_OUTPUT_DESC frame_desc = {};
+    frame_desc.format = vsrc_desc.format;
+    frame_desc.width = vsrc_desc.width;
+    frame_desc.height = vsrc_desc.heigth;
+    frame_desc.content_colorspace = vsrc_desc.colorspace;
+    frame_desc.display_colorspace = HV_COLORSPACE_DISPLAY_P3;
+    frame_desc.transfer = vsrc_desc.transfer;
+    frame_desc.tone_mapper = HV_TONE_MAPPER_ACES;
+    frame_desc.max_content_luminance = vsrc_desc.max_content_luminance;
+    frame_desc.display_luminance = 344.0f;
 
-        winrt::check_hresult(source->GetDesc(vsrc_desc));
-        winrt::check_hresult(dec->IsSupported(vsrc_desc));
-        winrt::check_hresult(hav_instance->Link(source.get(), dec.get()));
+    winrt::check_hresult(hav_instance->CreateFrame(IID_HAV_NVFrame, frame_desc, nv_frame.put()));
 
-        FRAME_OUTPUT_DESC frame_desc = {};
-        frame_desc.format = vsrc_desc.format;
-        frame_desc.width = vsrc_desc.width;
-        frame_desc.height = vsrc_desc.heigth;
-        frame_desc.content_colorspace = vsrc_desc.colorspace;
-        frame_desc.display_colorspace = HV_COLORSPACE_DISPLAY_P3;
-        frame_desc.transfer = vsrc_desc.transfer;
-        frame_desc.tone_mapper = HV_TONE_MAPPER_ACES;
-        frame_desc.max_content_luminance = vsrc_desc.max_content_luminance;
-        frame_desc.display_luminance = 344.0f;
+    frame_desc.format = HV_FORMAT_BGRA64_HDR10;
+    winrt::check_hresult(hav_instance->CreateFrame(IID_HAV_NVFrame, frame_desc, rgba_frame.put()));
 
-        winrt::check_hresult(hav_instance->CreateFrame(IID_HAV_NVFrame, frame_desc, nv_frame.put()));
-
-        frame_desc.format = HV_FORMAT_BGRA32;
-        winrt::check_hresult(hav_instance->CreateFrame(IID_HAV_NVFrame, frame_desc, rgba_frame.put()));
-
-        hr = pdxgi_swpch->ResizeBuffers(3, vsrc_desc.width, vsrc_desc.heigth, DXGI_FORMAT_B8G8R8A8_UNORM, 0);
-    }
-    catch (winrt::hresult_error const& err) {
-        std::cout << "Error 0x%x" << err.code();
-        return;
-    }
+    hr = pdxgi_swpch->ResizeBuffers(3, vsrc_desc.width, vsrc_desc.heigth, DXGI_FORMAT_R16G16B16A16_FLOAT, 0);
 
     if (SUCCEEDED(hr))
     {
@@ -129,7 +113,7 @@ void DecodeMainLoop(THREAD_PARAMS par)
         hr = pdxgi_swpch->QueryInterface(&spwch);
         hr = spwch->SetColorSpace1(DXGI_COLOR_SPACE_RGB_FULL_G10_NONE_P709);
         D3D11_TEXTURE2D_DESC tex_desc = { 0 };
-        tex_desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+        tex_desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
         tex_desc.ArraySize = 1;
         tex_desc.MipLevels = 1;
         tex_desc.SampleDesc.Count = 1;
@@ -146,23 +130,55 @@ void DecodeMainLoop(THREAD_PARAMS par)
 
     while (!par.windowIsClosed) {
         try {
-            SYSTEMTIME start, stop;
-            GetSystemTime(&start);
+
             winrt::check_hresult(dec->Decode(nv_frame.get()));
             winrt::check_hresult(nv_frame->ConvertFormat(HV_FORMAT_RGBA8, rgba_frame.get()));
-            winrt::check_hresult(rgba_frame->CommitResource());
             cudaDeviceSynchronize();
-            GetSystemTime(&stop);
-            std::cout << stop.wMilliseconds - start.wMilliseconds << std::endl;
-           if (SUCCEEDED(hr)) hr = pdxgi_swpch->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pd3d11_bkbuffer);
+
+            winrt::check_hresult(rgba_frame->CommitResource());
+            if (SUCCEEDED(hr)) hr = pdxgi_swpch->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pd3d11_bkbuffer);
             pd3d11_ctx->CopyResource(pd3d11_bkbuffer, pd3d11_cuda_shresource);
-            pdxgi_swpch->Present(1, 0);
+            pdxgi_swpch->Present(0, 0);
             pd3d11_bkbuffer->Release();
         }
         catch (winrt::hresult_error const& err) {
             std::cout << err.code();
         }
     }
+
+}
+void DecodeMainLoop(THREAD_PARAMS par)
+{
+
+    winrt::com_ptr<IVideoSource> source;
+    winrt::com_ptr<IDecoder> dec;
+    winrt::com_ptr<IDecoder> nvjpeg_decoder;
+    //cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync);
+    VIDEO_SOURCE_DESC vsrc_desc = { 0 };
+    try {
+        winrt::check_hresult(hav_instance->CreateDecoder(IID_HAV_NVDEC, dec.put()));
+        winrt::check_hresult(hav_instance->CreateDecoder(IID_HAV_NVJpegDecoder, nvjpeg_decoder.put()));
+        winrt::check_hresult(demx->VideoCapture(par.name.c_str(), source.put()));
+        winrt::check_hresult(hav_instance->Link(dev_nvidia.get(), dec.get()));
+
+        winrt::check_hresult(source->GetDesc(vsrc_desc));
+        if (dec->IsSupported(vsrc_desc) != S_OK) {
+            if (nvjpeg_decoder->IsSupported(vsrc_desc) == S_OK) {
+                winrt::check_hresult(hav_instance->Link(source.get(), nvjpeg_decoder.get()));
+                DecodeMain(nvjpeg_decoder.get(), par, vsrc_desc);
+            }
+
+        }else {
+            winrt::check_hresult(hav_instance->Link(source.get(), dec.get()));
+            DecodeMain(dec.get(), par, vsrc_desc);
+        }
+    }
+    catch (winrt::hresult_error const& err) {
+        std::cout << "Error 0x%x" << err.code();
+        return;
+    }
+
+
 }
 
 
@@ -260,7 +276,7 @@ int main(int argc, char** argv)
     THREAD_PARAMS par;
 
     par.hwnd = core_hwnd;
-    par.name = "rtsp://admin:1q2w3e4r@192.168.1.6/ch1/main/av_stream";
+    par.name = "world.mkv";
     HANDLE hThread = CreateThread(nullptr,
         0,
         reinterpret_cast<LPTHREAD_START_ROUTINE>(DecodeMainLoop),
