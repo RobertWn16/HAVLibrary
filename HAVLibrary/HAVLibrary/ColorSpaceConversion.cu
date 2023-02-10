@@ -131,10 +131,6 @@ __global__ void p016_HDR10_bgra64_HDR10_PQ_ACES_kernel(unsigned short* cuLuma,
 		G_FP32 = EOTF_LUT[(int)G_FP32];
 		B_FP32 = EOTF_LUT[(int)B_FP32];
 
-		R_FP32 = R_FP32 < 0 ? 0 : (R_FP32 > (maxValue - 1) ? (maxValue - 1) : R_FP32);
-		G_FP32 = G_FP32 < 0 ? 0 : (G_FP32 > (maxValue - 1) ? (maxValue - 1) : G_FP32);
-		B_FP32 = B_FP32 < 0 ? 0 : (B_FP32 > (maxValue - 1) ? (maxValue - 1) : B_FP32);
-
 		X_plane = __device_RGB_XYZ_Mat[0][0] * R_FP32 + __device_RGB_XYZ_Mat[0][1] * G_FP32 + __device_RGB_XYZ_Mat[0][2] * B_FP32;
 		Y_plane = __device_RGB_XYZ_Mat[1][0] * R_FP32 + __device_RGB_XYZ_Mat[1][1] * G_FP32 + __device_RGB_XYZ_Mat[1][2] * B_FP32;
 		Z_plane = __device_RGB_XYZ_Mat[2][0] * R_FP32 + __device_RGB_XYZ_Mat[2][1] * G_FP32 + __device_RGB_XYZ_Mat[2][2] * B_FP32;

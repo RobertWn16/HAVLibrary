@@ -2,8 +2,10 @@
 
 DevNVIDIA::~DevNVIDIA()
 {
-    if(cuContext)
+    if (cuContext) {
         cuCtxDestroy(cuContext);
+        cuContext = nullptr;
+    }
 }
 
 winrt::hresult DevNVIDIA::InitDevice(DEV_DESC dev_desc)

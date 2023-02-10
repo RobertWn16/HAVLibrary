@@ -62,7 +62,7 @@ void DecodeMain(IDecoder* dec, THREAD_PARAMS &par,  VIDEO_SOURCE_DESC vsrc_desc)
 
     if (SUCCEEDED(hr))
     {
-        dxgi_desc.BufferCount = 3;
+        dxgi_desc.BufferCount = 2;
         dxgi_desc.Format = DXGI_FORMAT_R10G10B10A2_UNORM;
         dxgi_desc.BufferUsage = DXGI_USAGE_BACK_BUFFER;
         dxgi_desc.SampleDesc.Count = 1;      //multisampling setting
@@ -95,10 +95,9 @@ void DecodeMain(IDecoder* dec, THREAD_PARAMS &par,  VIDEO_SOURCE_DESC vsrc_desc)
 
     winrt::check_hresult(hav_instance->CreateFrame(IID_HAV_NVFrame, frame_desc, nv_frame.put()));
 
-    frame_desc.format = HV_FORMAT_BGRA64_HDR10;
+    frame_desc.format = HV_FORMAT_BGRA32;
     winrt::check_hresult(hav_instance->CreateFrame(IID_HAV_NVFrame, frame_desc, rgba_frame.put()));
-
-    hr = pdxgi_swpch->ResizeBuffers(3, vsrc_desc.width, vsrc_desc.heigth, DXGI_FORMAT_R16G16B16A16_FLOAT, 0);
+    hr = pdxgi_swpch->ResizeBuffers(3, vsrc_desc.width, vsrc_desc.heigth, DXGI_FORMAT_B8G8R8A8_UNORM, 0);
 
     if (SUCCEEDED(hr))
     {
@@ -113,7 +112,7 @@ void DecodeMain(IDecoder* dec, THREAD_PARAMS &par,  VIDEO_SOURCE_DESC vsrc_desc)
         hr = pdxgi_swpch->QueryInterface(&spwch);
         hr = spwch->SetColorSpace1(DXGI_COLOR_SPACE_RGB_FULL_G10_NONE_P709);
         D3D11_TEXTURE2D_DESC tex_desc = { 0 };
-        tex_desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+        tex_desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
         tex_desc.ArraySize = 1;
         tex_desc.MipLevels = 1;
         tex_desc.SampleDesc.Count = 1;
@@ -124,21 +123,26 @@ void DecodeMain(IDecoder* dec, THREAD_PARAMS &par,  VIDEO_SOURCE_DESC vsrc_desc)
 
         hr = pd3d11_dev->CreateTexture2D(&tex_bkbuffer, nullptr, &pd3d11_cuda_shresource);
         pd3d11_bkbuffer->Release();
+
     }
 
     winrt::check_hresult(rgba_frame->RegisterD3D11Resource(pd3d11_cuda_shresource));
 
     while (!par.windowIsClosed) {
         try {
-
+            SYSTEMTIME start, stop;
+            GetSystemTime(&start);
             winrt::check_hresult(dec->Decode(nv_frame.get()));
+            Sleep(10);
             winrt::check_hresult(nv_frame->ConvertFormat(HV_FORMAT_RGBA8, rgba_frame.get()));
             cudaDeviceSynchronize();
+            GetSystemTime(&stop);
 
+            std::cout << "Time elapsed is " << stop.wMilliseconds - start.wMilliseconds << std::endl;
             winrt::check_hresult(rgba_frame->CommitResource());
             if (SUCCEEDED(hr)) hr = pdxgi_swpch->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pd3d11_bkbuffer);
             pd3d11_ctx->CopyResource(pd3d11_bkbuffer, pd3d11_cuda_shresource);
-            pdxgi_swpch->Present(0, 0);
+            pdxgi_swpch->Present(1, 0);
             pd3d11_bkbuffer->Release();
         }
         catch (winrt::hresult_error const& err) {
@@ -153,7 +157,7 @@ void DecodeMainLoop(THREAD_PARAMS par)
     winrt::com_ptr<IVideoSource> source;
     winrt::com_ptr<IDecoder> dec;
     winrt::com_ptr<IDecoder> nvjpeg_decoder;
-    //cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync);
+    cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync);
     VIDEO_SOURCE_DESC vsrc_desc = { 0 };
     try {
         winrt::check_hresult(hav_instance->CreateDecoder(IID_HAV_NVDEC, dec.put()));
@@ -276,7 +280,7 @@ int main(int argc, char** argv)
     THREAD_PARAMS par;
 
     par.hwnd = core_hwnd;
-    par.name = "world.mkv";
+    par.name = "http://10.1.1.20:8080";
     HANDLE hThread = CreateThread(nullptr,
         0,
         reinterpret_cast<LPTHREAD_START_ROUTINE>(DecodeMainLoop),
