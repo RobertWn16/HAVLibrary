@@ -85,6 +85,26 @@ winrt::hresult __stdcall HAV::CreateDemuxer(REFIID iid, IDemuxer** Out)
     return E_NOINTERFACE;
 }
 
+winrt::hresult __stdcall HAV::CreateDisplay(REFIID iid, IDisplay** Out)
+{
+    if (IsEqualIID(iid, IID_HAV_WinDisplay))
+    {
+        winrt::com_ptr<WinDisplay> display_ptr;
+        try {
+            winrt::check_pointer(Out);
+            display_ptr = winrt::make_self<WinDisplay>();
+            winrt::check_pointer(display_ptr.get());
+            display_ptr->ConfigureDisplay();
+            *Out = display_ptr.get();
+            display_ptr.detach();
+            return S_OK;
+        } catch (winrt::hresult_error const& err) {
+            return err.code();
+        }
+    }
+    return winrt::hresult();
+}
+
 winrt::hresult __stdcall HAV::CreateDecoder(REFIID iid, IDecoder** Out)
 {
     winrt::com_ptr<IDecoder> dec_ptr;
@@ -117,6 +137,11 @@ winrt::hresult __stdcall HAV::CreateDecoder(REFIID iid, IDecoder** Out)
         }
     }
     return E_NOINTERFACE;
+}
+
+winrt::hresult __stdcall HAV::CreateEncoder(REFIID iid, IEncoder** Out)
+{
+    return S_OK;
 }
 
 winrt::hresult __stdcall HAV::CreateFrame(REFIID iid, FRAME_OUTPUT_DESC frame_desc, IFrame** Out)

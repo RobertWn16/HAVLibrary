@@ -8,16 +8,17 @@ DEFINE_GUID(IID_HAV_IVCaptureSource,
 
 struct VIDEO_SOURCE_DESC
 {
+	unsigned int width;
+	unsigned int heigth;
+	unsigned int bitdepth;
 	double duration;
 	double framerate;
+
+	HVColorSpace colorspace;
 	HVCodec codec;
 	HVChroma chroma;
 	HVFormat format;
-	HVColorSpace colorspace;
 	HVTransfer transfer;
-	unsigned int bitdepth;
-	unsigned int width;
-	unsigned int heigth;
 
 	//HDR Metadata
 	float max_content_luminance;
@@ -25,10 +26,11 @@ struct VIDEO_SOURCE_DESC
 	float MaxCLL;
 	float MaxFALL;
 };
-
+interface ID3D11Texture2D;
 class __declspec(uuid("3E0E196D-A155-431F-AFA1-1BDA94298955")) IVideoSource : public IHAVComponent
 {
 public:
 	virtual winrt::hresult GetDesc(VIDEO_SOURCE_DESC &desc) = 0;
 	virtual winrt::hresult Parse(void *desc) = 0;
+	virtual winrt::hresult Parse(ID3D11Texture2D** Out) noexcept = 0;
 };

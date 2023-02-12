@@ -152,10 +152,13 @@
     <ClCompile Include="FFMPEGVideoSource.cpp" />
     <ClCompile Include="FFMPEGDemuxer.cpp" />
     <ClCompile Include="HAV.cpp" />
+    <ClCompile Include="HAVUtilsPrivate.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NVDEC.cpp" />
     <ClCompile Include="NVFrame.cpp" />
     <ClCompile Include="NVJpegDecoder.cpp" />
+    <ClCompile Include="WinDisplay.cpp" />
+    <ClCompile Include="WinDisplayVideoSource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="devNVIDIA.hpp" />
@@ -166,6 +169,8 @@
     <ClInclude Include="HAVUtilsPrivate.hpp" />
     <ClInclude Include="ColorSpaceConversion.cuh" />
     <ClInclude Include="IDev.hpp" />
+    <ClInclude Include="IDisplay.hpp" />
+    <ClInclude Include="IEncoder.hpp" />
     <ClInclude Include="IFrame.hpp" />
     <ClInclude Include="IHAVComponent.hpp" />
     <ClInclude Include="IVIdeoSource.hpp" />
@@ -179,6 +184,8 @@
     <ClInclude Include="NVFrame.hpp" />
     <ClInclude Include="NVJpegDecoder.hpp" />
     <ClInclude Include="pch.hpp" />
+    <ClInclude Include="WinDisplay.hpp" />
+    <ClInclude Include="WinDisplayVideoSource.hpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="ColorSpaceConversion.cu" />

@@ -48,6 +48,11 @@ winrt::hresult FFMPEGVideoSource::Parse(void* desc)
 	}
 }
 
+winrt::hresult FFMPEGVideoSource::Parse(ID3D11Texture2D** Out) noexcept
+{
+	return E_NOINTERFACE;
+}
+
 void FFMPEGVideoSource::InitSource(FVContext ctx, VIDEO_SOURCE_DESC source)
 {
 	source_ctx.av_fmt_context = ctx.av_fmt_context;

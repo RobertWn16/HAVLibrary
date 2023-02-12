@@ -1,5 +1,6 @@
 #include "IHAV.hpp"
 #include "NVDEC.hpp"
+#include "WinDisplay.hpp"
 #include "DevNVIDIA.hpp"
 #include "FFMPEGDemuxer.hpp"
 #include "NVJpegDecoder.hpp"
@@ -10,6 +11,8 @@ public:
 	winrt::hresult STDMETHODCALLTYPE Link(IHAVComponent* In, IHAVComponent* Out);
 	winrt::hresult STDMETHODCALLTYPE CreateDevice(REFIID iid, DEV_DESC dev_desc, IDev** Out);
 	winrt::hresult STDMETHODCALLTYPE CreateDemuxer(REFIID iid, IDemuxer **Out);
+	winrt::hresult STDMETHODCALLTYPE CreateDisplay(REFIID iid, IDisplay **Out);
 	winrt::hresult STDMETHODCALLTYPE CreateDecoder(REFIID iid, IDecoder **Out);
+	winrt::hresult STDMETHODCALLTYPE CreateEncoder(REFIID iid, IEncoder** Out);
 	winrt::hresult STDMETHODCALLTYPE CreateFrame(REFIID iid, FRAME_OUTPUT_DESC frame_desc, IFrame** Out);
 };

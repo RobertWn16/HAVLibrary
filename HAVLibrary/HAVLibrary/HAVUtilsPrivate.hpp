@@ -1,7 +1,6 @@
 #pragma once
 #include "pch.hpp"
 #include "HAVTypes.hpp"
-
 extern "C"
 {
 	#include <libavformat/avformat.h>
@@ -12,7 +11,7 @@ extern "C"
 }
 #include <nvcuvid.h>
 #include <cuda.h>
-
+#include <d3d11.h>
 #pragma comment(lib, "nvcuvid")
 #pragma comment(lib, "cuda")
 
@@ -62,6 +61,8 @@ struct PACKET_DESC
 	int32_t timestamp;
 };
 
+HVFormat DXGIFmtHV(DXGI_FORMAT dxgi_format);
+HVColorSpace DXGICsHV(DXGI_COLOR_SPACE_TYPE dxgi_colorspace);
 /*static void HAV_LOG(std::string componentName, winrt::hresult code, winrt::hstring errName)
 {
 	std::cout << "[" << componentName << " ]: " << errName << " -> Error code 0x%x";

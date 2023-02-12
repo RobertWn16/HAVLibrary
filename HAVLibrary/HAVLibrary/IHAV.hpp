@@ -1,6 +1,8 @@
 #pragma once
 #include "IDecoder.hpp"
 #include "IDemuxer.hpp"
+#include "IDisplay.hpp"
+#include "IEncoder.hpp"
 #include "IDev.hpp"
 
 // {D29BE54E-46E0-4A19-BC88-6C12673FE823}
@@ -13,6 +15,8 @@ public:
 	virtual winrt::hresult STDMETHODCALLTYPE Link(IHAVComponent* In, IHAVComponent* Out) = 0;
 	virtual winrt::hresult STDMETHODCALLTYPE CreateDevice(REFIID iid, DEV_DESC dev_desc, IDev** Out) = 0;
 	virtual winrt::hresult STDMETHODCALLTYPE CreateDemuxer(REFIID iid, IDemuxer **Out) = 0;
+	virtual winrt::hresult STDMETHODCALLTYPE CreateDisplay(REFIID iid, IDisplay** Out) = 0;
 	virtual winrt::hresult STDMETHODCALLTYPE CreateDecoder(REFIID iid, IDecoder **Out) = 0;
+	virtual winrt::hresult STDMETHODCALLTYPE CreateEncoder(REFIID iid, IEncoder **Out) = 0;
 	virtual winrt::hresult STDMETHODCALLTYPE CreateFrame(REFIID iid, FRAME_OUTPUT_DESC frame_desc, IFrame** Out) = 0;
 };

@@ -29,6 +29,7 @@ public:
 
 	winrt::hresult GetDesc(VIDEO_SOURCE_DESC &desc) final;
 	winrt::hresult Parse(void* desc) final;
+	winrt::hresult Parse(ID3D11Texture2D** Out) noexcept final;
 	void InitSource(FVContext ctx, VIDEO_SOURCE_DESC desc);
 };
 

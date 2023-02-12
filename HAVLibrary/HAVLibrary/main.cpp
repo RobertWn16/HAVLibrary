@@ -17,6 +17,7 @@ IDXGIDevice3* pdxgi_dev = nullptr;
 winrt::com_ptr<IDemuxer> demx;
 winrt::com_ptr<HAV> hav_instance = winrt::make_self<HAV>();
 winrt::com_ptr<IDev> dev_nvidia;
+winrt::com_ptr<IVideoSource> display_source;
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -181,8 +182,48 @@ void DecodeMainLoop(THREAD_PARAMS par)
         std::cout << "Error 0x%x" << err.code();
         return;
     }
+}
 
+void DesktopDuplication(THREAD_PARAMS par)
+{
+    IDXGISwapChain1* pdxgi_swpch = nullptr;
+    HRESULT hr = S_OK;
+    DXGI_SWAP_CHAIN_DESC1 dxgi_desc = { };
+    DXGI_SWAP_CHAIN_FULLSCREEN_DESC dxgi_desc_fs = { };
+    ID3D11Texture2D* out_tex = nullptr;
+    ID3D11Texture2D* pd3d11_bkbuffer = nullptr;
+    dxgi_desc.BufferCount = 3;
+    dxgi_desc.Format = DXGI_FORMAT_R10G10B10A2_UNORM;
+    dxgi_desc.BufferUsage = DXGI_USAGE_BACK_BUFFER;
+    dxgi_desc.SampleDesc.Count = 1;      //multisampling setting
+    dxgi_desc.SampleDesc.Quality = 0;    //vendor-specific flag
+    dxgi_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+    dxgi_desc.Scaling = DXGI_SCALING_STRETCH;
 
+    dxgi_desc_fs.RefreshRate.Numerator = 1;
+    dxgi_desc_fs.RefreshRate.Denominator = 60;
+    dxgi_desc_fs.Scaling = DXGI_MODE_SCALING_STRETCHED;
+    dxgi_desc_fs.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_PROGRESSIVE;
+    dxgi_desc_fs.Windowed = true;
+
+    hr = pdxgi_fty->CreateSwapChainForHwnd(pd3d11_dev, par.hwnd, &dxgi_desc, NULL, NULL, &pdxgi_swpch);
+    DXGI_RGBA rgba = { };
+    rgba.a = 255;
+
+    hr = pdxgi_swpch->ResizeBuffers(3, 1920, 1080, DXGI_FORMAT_B8G8R8A8_UNORM, 0);
+
+    while (!par.windowIsClosed) {
+        try {
+            display_source->Parse(&out_tex);
+            if (SUCCEEDED(hr)) hr = pdxgi_swpch->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pd3d11_bkbuffer);
+            pd3d11_ctx->CopyResource(pd3d11_bkbuffer, out_tex);
+            pdxgi_swpch->Present(1, 0);
+            pd3d11_bkbuffer->Release();
+        }
+        catch (winrt::hresult_error const& err) {
+            std::cout << err.code();
+        }
+    }
 }
 
 
@@ -275,15 +316,28 @@ int main(int argc, char** argv)
     dev_desc.vendor = NVIDIA;
     dev_desc.ordinal = 0;
 
+    winrt::com_ptr<IDisplay> display;
+
     winrt::check_hresult(hav_instance->CreateDevice(IID_HAV_NVDev, dev_desc, dev_nvidia.put()));
     winrt::check_hresult(hav_instance->CreateDemuxer(IID_HAV_FFMPEGDemuxer, demx.put()));
+    winrt::check_hresult(hav_instance->CreateDisplay(IID_HAV_WinDisplay, display.put()));
+
+    display->DisplayCapture(display_source.put());
     THREAD_PARAMS par;
 
-    par.hwnd = core_hwnd;
+    /*par.hwnd = core_hwnd;
     par.name = "http://10.1.1.20:8080";
     HANDLE hThread = CreateThread(nullptr,
         0,
         reinterpret_cast<LPTHREAD_START_ROUTINE>(DecodeMainLoop),
+        &par,
+        0,
+        nullptr);*/
+    par.hwnd = core_hwnd;
+
+    HANDLE hThread = CreateThread(nullptr,
+        0,
+        reinterpret_cast<LPTHREAD_START_ROUTINE>(DesktopDuplication),
         &par,
         0,
         nullptr);
@@ -296,5 +350,5 @@ int main(int argc, char** argv)
     }
 
     par.windowIsClosed = true;
-    WaitForSingleObject(hThread, INFINITE);
+    //WaitForSingleObject(hThread, INFINITE);
 }

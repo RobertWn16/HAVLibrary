@@ -1,0 +1,72 @@
+#include "WinDisplayVideoSource.hpp"
+
+constexpr int MAX_TIMEOUT = 100;
+
+winrt::hresult WinDisplayVideoSource::GetDesc(VIDEO_SOURCE_DESC& desc)
+{
+    return winrt::hresult();
+}
+
+winrt::hresult WinDisplayVideoSource::Parse(void* desc)
+{
+    return winrt::hresult();
+}
+
+winrt::hresult WinDisplayVideoSource::Parse(ID3D11Texture2D **Out) noexcept
+{
+    DXGI_OUTDUPL_FRAME_INFO outdpl_frame_info = { 0 };
+    winrt::com_ptr<IDXGIResource> pwdsDxgiResource;
+    winrt::com_ptr<ID3D11Texture2D> pwdsBufTex;
+    D3D11_TEXTURE2D_DESC desc;
+    HRESULT hr = S_OK;
+    try
+    {
+        hr = pwdsOutputDupl->AcquireNextFrame(INFINITE, &outdpl_frame_info, pwdsDxgiResource.put());
+        winrt::check_pointer(pwdsDxgiResource.get());
+        pwdsDxgiResource.as(pwdsBufTex);
+        pwdsBufTex->GetDesc(&desc);
+        winrt::check_pointer(pwdsBufTex.get());
+        pwdsDeviceCtx->CopyResource(pwdsTex.get(), pwdsBufTex.get());
+        *Out = pwdsTex.get();
+        pwdsOutputDupl->ReleaseFrame();
+    }catch (winrt::hresult_error const& err) {
+        return err.code();
+    }
+
+
+    return S_OK;
+}
+
+winrt::hresult WinDisplayVideoSource::ConfigureVideoSource(VIDEO_SOURCE_DESC vsrc_desc, ID3D11Device* pDevice, IDXGIOutputDuplication* pOutputDupl)
+{
+    winrt::com_ptr<IDXGIDevice> pwdsDxgiDevice;
+    try {  
+        winrt::check_pointer(pDevice);
+        pwdsDevice = pDevice;
+        pwdsDevice->GetImmediateContext(&pwdsDeviceCtx);
+        winrt::check_pointer(&pwdsDeviceCtx);
+
+        winrt::check_pointer(pOutputDupl);
+        pwdsOutputDupl.attach(pOutputDupl);
+        video_source_desc = vsrc_desc;
+
+        DXGI_OUTDUPL_DESC outdupl_desc = { 0 };
+        pwdsOutputDupl->GetDesc(&outdupl_desc);
+        video_source_desc.framerate = (double)(outdupl_desc.ModeDesc.RefreshRate.Numerator) / outdupl_desc.ModeDesc.RefreshRate.Denominator;
+
+        D3D11_TEXTURE2D_DESC tex_desc = { 0 };
+        tex_desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+        tex_desc.ArraySize = 1;
+        tex_desc.MipLevels = 1;
+        tex_desc.SampleDesc.Count = 1;
+        tex_desc.Width = video_source_desc.width;
+        tex_desc.Height = video_source_desc.heigth;
+        tex_desc.BindFlags = D3D11_BIND_RENDER_TARGET;
+        tex_desc.Usage = D3D11_USAGE_DEFAULT;
+        winrt::check_hresult(pwdsDevice->CreateTexture2D(&tex_desc, nullptr, pwdsTex.put()));
+    }catch (winrt::hresult_error const& err) {
+        std::cout << err.code();
+    }
+
+    return S_OK;
+}

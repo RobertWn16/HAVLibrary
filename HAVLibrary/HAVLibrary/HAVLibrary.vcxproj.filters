@@ -51,6 +51,15 @@
     <ClCompile Include="NVJpegDecoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WinDisplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WinDisplayVideoSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HAVUtilsPrivate.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IMuxer.hpp">
@@ -115,6 +124,18 @@
     </ClInclude>
     <ClInclude Include="NVJpegDecoder.hpp">
       <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="IDisplay.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="WinDisplay.hpp">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="WinDisplayVideoSource.hpp">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="IEncoder.hpp">
+      <Filter>Interfaces</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
