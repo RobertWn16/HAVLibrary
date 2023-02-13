@@ -317,11 +317,12 @@ int main(int argc, char** argv)
     dev_desc.ordinal = 0;
 
     winrt::com_ptr<IDisplay> display;
-
+    winrt::com_ptr<IEncoder> encoder;
     winrt::check_hresult(hav_instance->CreateDevice(IID_HAV_NVDev, dev_desc, dev_nvidia.put()));
     winrt::check_hresult(hav_instance->CreateDemuxer(IID_HAV_FFMPEGDemuxer, demx.put()));
     winrt::check_hresult(hav_instance->CreateDisplay(IID_HAV_WinDisplay, display.put()));
-
+    winrt::check_hresult(hav_instance->CreateEncoder(IID_HAV_NVENC, encoder.put()));
+    hav_instance->Link(dev_nvidia.get(), encoder.get());
     display->DisplayCapture(display_source.put());
     THREAD_PARAMS par;
 

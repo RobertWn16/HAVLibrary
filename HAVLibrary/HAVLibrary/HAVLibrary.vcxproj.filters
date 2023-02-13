@@ -60,6 +60,9 @@
     <ClCompile Include="HAVUtilsPrivate.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="NVENC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IMuxer.hpp">
@@ -136,6 +139,9 @@
     </ClInclude>
     <ClInclude Include="IEncoder.hpp">
       <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="NVENC.hpp">
+      <Filter>Private</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

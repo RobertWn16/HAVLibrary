@@ -1,6 +1,7 @@
 #include "NVDEC.hpp"
 #include <iostream>
 #include <fstream>
+#include "NVENC.hpp"
 static double GetFrameSizeCh(HVChroma chroma)
 {
     switch (chroma)
@@ -139,7 +140,6 @@ winrt::hresult NVDEC::IsSupported(VIDEO_SOURCE_DESC desc)
 
     return S_OK;
 }
-
 
 winrt::hresult NVDEC::Decode(IFrame *out)
 {

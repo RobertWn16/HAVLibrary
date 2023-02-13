@@ -155,6 +155,7 @@
     <ClCompile Include="HAVUtilsPrivate.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NVDEC.cpp" />
+    <ClCompile Include="NVENC.cpp" />
     <ClCompile Include="NVFrame.cpp" />
     <ClCompile Include="NVJpegDecoder.cpp" />
     <ClCompile Include="WinDisplay.cpp" />
@@ -181,6 +182,7 @@
     <ClInclude Include="IPresenter.hpp" />
     <ClInclude Include="LUTS.cuh" />
     <ClInclude Include="NVDEC.hpp" />
+    <ClInclude Include="NVENC.hpp" />
     <ClInclude Include="NVFrame.hpp" />
     <ClInclude Include="NVJpegDecoder.hpp" />
     <ClInclude Include="pch.hpp" />

@@ -14,6 +14,11 @@ winrt::hresult HAV::Link(IHAVComponent* In, IHAVComponent* Out)
             else
                 return E_HV_ALREADY_LINKED;
         }
+
+        NVENC* nv_encoder = dynamic_cast<NVENC*>(Out);
+        if (nv_encoder) {
+            nv_encoder->ConfigureEncoder(dev_nvidia->GetContext());
+        }
         return E_INVALIDARG;
     }
 
@@ -141,6 +146,20 @@ winrt::hresult __stdcall HAV::CreateDecoder(REFIID iid, IDecoder** Out)
 
 winrt::hresult __stdcall HAV::CreateEncoder(REFIID iid, IEncoder** Out)
 {
+    winrt::com_ptr<IEncoder> enc_ptr;
+    if (IsEqualIID(iid, IID_HAV_NVENC)) {
+        try {
+            winrt::check_pointer(Out);
+            enc_ptr = winrt::make_self<NVENC>();
+            winrt::check_pointer(enc_ptr.get());
+            *Out = enc_ptr.get();
+            enc_ptr.detach();
+            return S_OK;
+        }
+        catch (winrt::hresult_error const& err) {
+            return err.code();
+        }
+    }
     return S_OK;
 }
 
