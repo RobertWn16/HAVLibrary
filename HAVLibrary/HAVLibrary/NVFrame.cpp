@@ -153,10 +153,21 @@ winrt::hresult NVFrame::CommitResource()
             cuDesc.width * GetChannelFactor(cuDesc.format),
             cuDesc.width * GetChannelFactor(cuDesc.format), cuDesc.height,
             cudaMemcpyDeviceToDevice)));
-    } catch (winrt::hresult_error const& err) {
+    }catch (winrt::hresult_error const& err) {
         return err.code();
     }
     
+    return S_OK;
+}
+
+winrt::hresult NVFrame::CommitFrame()
+{
+    try {
+        winrt::check_hresult(CUDAHr(cudaMemcpy2DFromArray((void*)cuFrame, cuDesc.width * GetChannelFactor(cuDesc.format),
+            resourceArray, 0, 0, cuDesc.width * GetChannelFactor(cuDesc.format), cuDesc.height, cudaMemcpyDeviceToDevice)));
+    }catch (winrt::hresult_error const& err) {
+        return err.code();
+    }
     return S_OK;
 }
 

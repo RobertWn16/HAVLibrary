@@ -28,5 +28,6 @@ public:
 	winrt::hresult ConvertFormat(HVFormat fmt, IFrame *out);
 	winrt::hresult RegisterD3D11Resource(ID3D11Resource* resource);
 	winrt::hresult CommitResource();
+	winrt::hresult CommitFrame() final;
 	winrt::hresult ConfigureFrame(FRAME_OUTPUT_DESC desc);
 };

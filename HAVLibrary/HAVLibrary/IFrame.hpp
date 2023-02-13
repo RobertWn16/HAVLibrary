@@ -30,4 +30,5 @@ public:
 	//virtual winrt::hresult RegisterD3D9Resource(IDirect3DResource* resource) = 0;
 	virtual winrt::hresult RegisterD3D11Resource(ID3D11Resource* resource) = 0;
 	virtual winrt::hresult CommitResource() = 0;
+	virtual winrt::hresult CommitFrame() = 0;
 };

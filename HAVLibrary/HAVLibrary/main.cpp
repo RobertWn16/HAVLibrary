@@ -186,6 +186,7 @@ void DecodeMainLoop(THREAD_PARAMS par)
 
 void DesktopDuplication(THREAD_PARAMS par)
 {
+    winrt::com_ptr<IFrame> nv_frame;
     IDXGISwapChain1* pdxgi_swpch = nullptr;
     HRESULT hr = S_OK;
     DXGI_SWAP_CHAIN_DESC1 dxgi_desc = { };
@@ -210,13 +211,27 @@ void DesktopDuplication(THREAD_PARAMS par)
     DXGI_RGBA rgba = { };
     rgba.a = 255;
 
-    hr = pdxgi_swpch->ResizeBuffers(3, 1920, 1080, DXGI_FORMAT_B8G8R8A8_UNORM, 0);
+    hr = pdxgi_swpch->ResizeBuffers(3, 3840, 2160, DXGI_FORMAT_B8G8R8A8_UNORM, 0);
+    FRAME_OUTPUT_DESC frame_desc = {};
+    frame_desc.format = HV_FORMAT_BGRA32;
+    frame_desc.width = 3840;
+    frame_desc.height = 2160;
+    frame_desc.content_colorspace = HV_COLORSPACE_BT2020;
+    frame_desc.display_colorspace = HV_COLORSPACE_DISPLAY_P3;
+
+    winrt::check_hresult(hav_instance->CreateFrame(IID_HAV_NVFrame, frame_desc, nv_frame.put()));
+
+    display_source->Parse(&out_tex);
+    nv_frame->RegisterD3D11Resource(out_tex);
 
     while (!par.windowIsClosed) {
         try {
+
             display_source->Parse(&out_tex);
             if (SUCCEEDED(hr)) hr = pdxgi_swpch->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pd3d11_bkbuffer);
             pd3d11_ctx->CopyResource(pd3d11_bkbuffer, out_tex);
+            nv_frame->CommitFrame();
+
             pdxgi_swpch->Present(1, 0);
             pd3d11_bkbuffer->Release();
         }

@@ -7,6 +7,7 @@
 struct NVENC : winrt::implements<NVENC, IEncoder>
 {
 private:
+	NV_ENCODE_API_FUNCTION_LIST functionList = { NV_ENCODE_API_FUNCTION_LIST_VER };
 	NV_ENC_INITIALIZE_PARAMS nvencInitPar;
 	void *nvencEncoder = nullptr;
 public:
