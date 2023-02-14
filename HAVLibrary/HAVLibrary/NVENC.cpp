@@ -12,9 +12,26 @@ winrt::hresult NVENC::IsSupported(VIDEO_SOURCE_DESC desc)
     return winrt::hresult();
 }
 
-winrt::hresult NVENC::Encode(IFrame* out)
+winrt::hresult NVENC::Encode(IFrame* in, IFrame* out)
 {
-    return winrt::hresult();
+    NVFrame* nv_frame = dynamic_cast<NVFrame*>(in);
+    if (nv_frame)
+    {
+        cudaError_t err = cudaMemcpy(nv_enc_input_buffer.inputBuffer, (const void*)nv_frame->cuFrame, 4 * 3840 * 2160, cudaMemcpyDeviceToDevice);
+        NVENCSTATUS stat = NV_ENC_SUCCESS;
+        NV_ENC_PIC_PARAMS pic_params;
+        pic_params.version = NV_ENC_PIC_PARAMS_VER;
+        pic_params.bufferFmt = NV_ENC_BUFFER_FORMAT_ABGR;
+        pic_params.inputBuffer = reinterpret_cast<NV_ENC_INPUT_PTR>(nv_frame->cuFrame);
+        pic_params.inputHeight = 2160;
+        pic_params.inputWidth = 3840;
+        pic_params.inputPitch = 4 * 3840;
+        pic_params.outputBitstream = new unsigned char[90000];
+        
+        stat = functionList.nvEncEncodePicture(nvencEncoder, &pic_params);
+        std::cout << "Is ok";
+    }
+    return S_OK;
 }
 
 winrt::hresult NVENC::ConfigureEncoder(CUcontext deviceContext)
@@ -64,6 +81,13 @@ winrt::hresult NVENC::ConfigureEncoder(CUcontext deviceContext)
         nvencParams.encodeConfig = &nvencPresetConf.presetCfg;
         stat = functionList.nvEncInitializeEncoder(nvencEncoder, &nvencParams);
 
+        nv_enc_input_buffer.version = NV_ENC_CREATE_INPUT_BUFFER_VER;
+        nv_enc_input_buffer.bufferFmt = NV_ENC_BUFFER_FORMAT_ARGB;
+        nv_enc_input_buffer.width = 3840;
+        nv_enc_input_buffer.height = 2160;
+        nv_enc_input_buffer.inputBuffer = nullptr;
+
+        stat = functionList.nvEncCreateInputBuffer(nvencEncoder, &nv_enc_input_buffer);
 
     }catch (winrt::hresult_error& err) {
         return err.code();

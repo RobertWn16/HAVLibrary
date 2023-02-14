@@ -9,5 +9,5 @@ class __declspec(uuid("E4EA258B-86C8-4528-9AFE-C1DCE01ACB1A")) IEncoder : public
 {
 public:
 	virtual winrt::hresult IsSupported(VIDEO_SOURCE_DESC desc) = 0;
-	virtual winrt::hresult Encode(IFrame* out) = 0;
+	virtual winrt::hresult Encode(IFrame* in, IFrame* out) = 0;
 };

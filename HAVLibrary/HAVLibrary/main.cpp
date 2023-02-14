@@ -224,6 +224,10 @@ void DesktopDuplication(THREAD_PARAMS par)
     display_source->Parse(&out_tex);
     nv_frame->RegisterD3D11Resource(out_tex);
 
+    winrt::com_ptr<IEncoder> encoder;
+    winrt::check_hresult(hav_instance->CreateEncoder(IID_HAV_NVENC, encoder.put()));
+    hav_instance->Link(dev_nvidia.get(), encoder.get());
+
     while (!par.windowIsClosed) {
         try {
 
@@ -231,7 +235,7 @@ void DesktopDuplication(THREAD_PARAMS par)
             if (SUCCEEDED(hr)) hr = pdxgi_swpch->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pd3d11_bkbuffer);
             pd3d11_ctx->CopyResource(pd3d11_bkbuffer, out_tex);
             nv_frame->CommitFrame();
-
+            encoder->Encode(nv_frame.get(), nullptr);
             pdxgi_swpch->Present(1, 0);
             pd3d11_bkbuffer->Release();
         }
@@ -332,12 +336,11 @@ int main(int argc, char** argv)
     dev_desc.ordinal = 0;
 
     winrt::com_ptr<IDisplay> display;
-    winrt::com_ptr<IEncoder> encoder;
+
     winrt::check_hresult(hav_instance->CreateDevice(IID_HAV_NVDev, dev_desc, dev_nvidia.put()));
     winrt::check_hresult(hav_instance->CreateDemuxer(IID_HAV_FFMPEGDemuxer, demx.put()));
     winrt::check_hresult(hav_instance->CreateDisplay(IID_HAV_WinDisplay, display.put()));
-    winrt::check_hresult(hav_instance->CreateEncoder(IID_HAV_NVENC, encoder.put()));
-    hav_instance->Link(dev_nvidia.get(), encoder.get());
+
     display->DisplayCapture(display_source.put());
     THREAD_PARAMS par;
 
