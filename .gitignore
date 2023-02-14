@@ -14,3 +14,7 @@ HAVLibrary/HAVLibrary/sample.rgb
 HAVLibrary/HAVLibrary/lgdemo.ts
 *.p016
 *.mp4
+*.rgb
+HAVLibrary/HAVLibrary/sample.h264
+HAVLibrary/HAVLibrary/sample
+*.h264

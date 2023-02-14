@@ -1,6 +1,7 @@
 #include "HAV.hpp"
 #include <cuda_fp16.h>
 #include <dxgi1_6.h>
+#include "FFMPEGMuxer.hpp"
 #pragma comment (lib, "d3d11")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxguid.lib")
@@ -228,6 +229,10 @@ void DesktopDuplication(THREAD_PARAMS par)
     winrt::check_hresult(hav_instance->CreateEncoder(IID_HAV_NVENC, encoder.put()));
     hav_instance->Link(dev_nvidia.get(), encoder.get());
 
+    winrt::com_ptr<FFMPEGMuxer> ffmpeg_muxer = winrt::make_self<FFMPEGMuxer>();
+    ffmpeg_muxer->VideoStream();
+    unsigned int size = 0;
+    unsigned char* buf = new unsigned char[100000];
     while (!par.windowIsClosed) {
         try {
 
@@ -235,7 +240,7 @@ void DesktopDuplication(THREAD_PARAMS par)
             if (SUCCEEDED(hr)) hr = pdxgi_swpch->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pd3d11_bkbuffer);
             pd3d11_ctx->CopyResource(pd3d11_bkbuffer, out_tex);
             nv_frame->CommitFrame();
-            encoder->Encode(nv_frame.get(), nullptr);
+            encoder->Encode(nv_frame.get(), buf, size);
             pdxgi_swpch->Present(1, 0);
             pd3d11_bkbuffer->Release();
         }

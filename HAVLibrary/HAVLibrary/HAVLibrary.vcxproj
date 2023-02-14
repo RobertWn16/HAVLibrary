@@ -149,6 +149,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DevNVIDIA.cpp" />
+    <ClCompile Include="FFMPEGMuxer.cpp" />
     <ClCompile Include="FFMPEGVideoSource.cpp" />
     <ClCompile Include="FFMPEGDemuxer.cpp" />
     <ClCompile Include="HAV.cpp" />
@@ -163,6 +164,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="devNVIDIA.hpp" />
+    <ClInclude Include="FFMPEGMuxer.hpp" />
+    <ClInclude Include="FFMPEGPacket.hpp" />
     <ClInclude Include="FFMPEGVideoSource.hpp" />
     <ClInclude Include="FFMPEGDemuxer.hpp" />
     <ClInclude Include="HAV.hpp" />
@@ -174,6 +177,7 @@
     <ClInclude Include="IEncoder.hpp" />
     <ClInclude Include="IFrame.hpp" />
     <ClInclude Include="IHAVComponent.hpp" />
+    <ClInclude Include="IPacket.hpp" />
     <ClInclude Include="IVIdeoSource.hpp" />
     <ClInclude Include="IDecoder.hpp" />
     <ClInclude Include="IDemuxer.hpp" />

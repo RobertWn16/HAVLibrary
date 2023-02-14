@@ -63,6 +63,9 @@
     <ClCompile Include="NVENC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FFMPEGMuxer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IMuxer.hpp">
@@ -141,6 +144,15 @@
       <Filter>Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="NVENC.hpp">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="IPacket.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="FFMPEGPacket.hpp">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="FFMPEGMuxer.hpp">
       <Filter>Private</Filter>
     </ClInclude>
   </ItemGroup>
