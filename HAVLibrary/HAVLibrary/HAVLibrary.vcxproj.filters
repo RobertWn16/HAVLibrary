@@ -66,6 +66,9 @@
     <ClCompile Include="FFMPEGMuxer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FFMPEGPacket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IMuxer.hpp">

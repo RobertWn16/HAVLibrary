@@ -2,26 +2,32 @@
 #include "IEncoder.hpp"
 #include "HAVUtilsPrivate.hpp"
 #include "NVFrame.hpp"
+#include "FFMPEGPacket.hpp"
 #include <nvEncodeAPI.h>
+
+struct NVENCQuality
+{
+	GUID nvenc_presetGuid;
+	NV_ENC_TUNING_INFO nvenc_tuningInfo;
+};
 
 struct NVENC : winrt::implements<NVENC, IEncoder>
 {
 private:
-	NV_ENCODE_API_FUNCTION_LIST functionList = { NV_ENCODE_API_FUNCTION_LIST_VER };
-	NV_ENC_INITIALIZE_PARAMS nvencInitPar;
-	NV_ENC_CREATE_INPUT_BUFFER nv_enc_input_buffer;
-	NV_ENC_CREATE_BITSTREAM_BUFFER nv_enc_bitstream;
-	CUdeviceptr frame = NULL;
-	void *nvencEncoder = nullptr;
-	NV_ENC_REGISTERED_PTR nv_enc_res;
-	NV_ENC_INPUT_PTR nv_enc_input;
+	NV_ENCODE_API_FUNCTION_LIST nvenc = { NV_ENCODE_API_FUNCTION_LIST_VER };
+	NV_ENC_REGISTERED_PTR nvencRegisteredPtr;
+	NV_ENC_OUTPUT_PTR nvencBistreamOutPtr;
+	HANDLE nvencCompletedFrame;
+	CUdeviceptr nvencFrame = NULL;
+	void* nvencPtr = nullptr;
 	CUcontext deviceCtx;
-	size_t pitch = 0;
-	FILE* output_test = nullptr;
+	size_t nvencFramePitch = 0;
+	ENCODER_DESC nvencDesc;
 
 public:
 	~NVENC();
 	winrt::hresult IsSupported(VIDEO_SOURCE_DESC desc);
-	winrt::hresult Encode(IFrame* in, unsigned char* buf, unsigned int& size);
-	winrt::hresult ConfigureEncoder(CUcontext deviceContext);
+	winrt::hresult Encode(IFrame* inFrame);
+	winrt::hresult GetEncodedPacket(IPacket* outPacket);
+	winrt::hresult ConfigureEncoder(ENCODER_DESC nvencDesc, CUcontext deviceContext);
 };

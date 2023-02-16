@@ -1,3 +1,4 @@
+#pragma once
 #include "IHAVComponent.hpp"
 #include "HAVUtilsPrivate.hpp"
 // {D31D1F45-A653-4668-BE4B-A074668FA9CD}
@@ -6,5 +7,4 @@ DEFINE_GUID(IID_HAV_IPacket,
 
 class __declspec(uuid("D31D1F45-A653-4668-BE4B-A074668FA9CD")) IPacket : public IHAVComponent
 {
-	AVPacket av_pck;
 };

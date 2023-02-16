@@ -14,6 +14,7 @@ public:
 	winrt::hresult STDMETHODCALLTYPE CreateDemuxer(REFIID iid, IDemuxer **Out);
 	winrt::hresult STDMETHODCALLTYPE CreateDisplay(REFIID iid, IDisplay **Out);
 	winrt::hresult STDMETHODCALLTYPE CreateDecoder(REFIID iid, IDecoder **Out);
-	winrt::hresult STDMETHODCALLTYPE CreateEncoder(REFIID iid, IEncoder** Out);
+	winrt::hresult STDMETHODCALLTYPE CreateEncoder(REFIID iid, ENCODER_DESC encoder_desc, IDev* dev, IEncoder** Out);
 	winrt::hresult STDMETHODCALLTYPE CreateFrame(REFIID iid, FRAME_OUTPUT_DESC frame_desc, IFrame** Out);
+	winrt::hresult STDMETHODCALLTYPE CreatePacket(REFIID iid, IPacket** Out);
 };

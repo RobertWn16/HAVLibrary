@@ -83,3 +83,11 @@ const HVColorimetry BT601_Colorimetry_625lines = { .xr = 0.640f, .yr = 0.630, .x
 const HVColorimetry BT709_Colorimetry = { .xr = 0.64f, .yr = 0.33f, .xg = 0.3f, .yg = 0.6f, .xb = 0.15f, .yb = 0.06f, .xw = 0.3127f, .yw = 0.3290f};
 const HVColorimetry BT2020_Colorimetry = { .xr = 0.708f, .yr = 0.292f, .xg = 0.170f, .yg = 0.797f, .xb = 0.131f, .yb = 0.046f, .xw = 0.3127f, .yw = 0.3290f };
 const HVColorimetry DisplayP3_Colorimetry = { .xr = 0.680f, .yr = 0.320f, .xg = 0.265f, .yg = 0.690f, .xb = 0.150f, .yb = 0.060f, .xw = 0.3127f, .yw = 0.3290f };
+
+enum HVEncoderPreset
+{
+	HV_ENCODER_ULTRA_LOW_QUALITY_H264,
+	HV_ENCODER_LOW_QUALITY_H264,
+	HV_ENCODER_MEDIUM_QUALITY_H264,
+	HV_ENCODER_HIGH_QUALITY_H264,
+};

@@ -150,6 +150,7 @@
   <ItemGroup>
     <ClCompile Include="DevNVIDIA.cpp" />
     <ClCompile Include="FFMPEGMuxer.cpp" />
+    <ClCompile Include="FFMPEGPacket.cpp" />
     <ClCompile Include="FFMPEGVideoSource.cpp" />
     <ClCompile Include="FFMPEGDemuxer.cpp" />
     <ClCompile Include="HAV.cpp" />

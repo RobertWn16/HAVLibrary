@@ -2,47 +2,50 @@
 
 FFMPEGMuxer::~FFMPEGMuxer()
 {
-    av_write_trailer(oc);
-    avio_close(oc->pb);
+    fclose(out);
     //avformat_free_context(oc);
 }
 
 winrt::hresult FFMPEGMuxer::VideoStream()
 {
-    int err;
-    oc = avformat_alloc_context();
-    const AVOutputFormat* fmt = av_guess_format("h264", NULL, NULL);
-    oc->oformat = fmt;
-    oc->url = (char*)"sample.h264";
+    int err = 0;
+    AVDictionary* options = NULL;
 
+    AVOutputFormat* fmt = nullptr;
+    AVCodecParameters* c;
+    AVStream* st;
+    char* filename = (char*)"sample.mp4";
+    avformat_network_init();
 
-    vs = avformat_new_stream(oc, NULL);
+    err = avformat_alloc_output_context2(&oc, fmt, nullptr, filename);
 
-    vs->id = 0;
+    st = avformat_new_stream(oc, nullptr);
 
-    // Set video parameters
-    AVCodecParameters* vpar = vs->codecpar;
-    vpar->codec_id = AV_CODEC_ID_H264;
-    vpar->codec_type = AVMEDIA_TYPE_VIDEO;
-    vpar->width = 3840;
-    vpar->height = 2160;
+    st->id = 0;
+    st->codecpar->codec_id = AV_CODEC_ID_H264;
+    st->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
+    st->codecpar->width = 3840;
+    st->codecpar->height = 2160;
+    st->time_base.num = 1;
+    st->time_base.den = 60;
 
-    err = avio_open(&oc->pb, oc->url, AVIO_FLAG_WRITE);
-    err = avformat_write_header(oc, NULL);
+    //err = avio_open2(&oc->pb, filename, AVIO_FLAG_WRITE, nullptr, &options);
+    oc->video_codec_id = AV_CODEC_ID_H264;
+    
+    oc->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+    err = avio_open(&oc->pb, filename, AVIO_FLAG_WRITE);
+    err = avformat_write_header(oc, nullptr);
 
-    pkt = av_packet_alloc();
-
+    av_dump_format(oc, 0, "sample.mp4", 1);
     return S_OK;
 }
 
-winrt::hresult FFMPEGMuxer::Stream(uint8_t* data, unsigned int size, int fps)
+winrt::hresult FFMPEGMuxer::Stream(IPacket* inPkt)
 {
-    pkt->dts = pkt->pts;
-    pkt->stream_index = vs->index;
-    pkt->data = data;
-    pkt->size = size;
+    int err = 0;
+    FFMPEGPacket* ffmpeg_pkt = dynamic_cast<FFMPEGPacket*>(inPkt);
 
-    av_write_frame(oc, pkt);
-    av_write_frame(oc, NULL);
+    err = av_write_frame(oc, ffmpeg_pkt->pkt);
+    //err = av_write_frame(oc, nullptr);
     return S_OK;
 }

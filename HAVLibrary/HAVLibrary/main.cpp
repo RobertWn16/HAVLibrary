@@ -225,10 +225,17 @@ void DesktopDuplication(THREAD_PARAMS par)
     display_source->Parse(&out_tex);
     nv_frame->RegisterD3D11Resource(out_tex);
 
-    winrt::com_ptr<IEncoder> encoder;
-    winrt::check_hresult(hav_instance->CreateEncoder(IID_HAV_NVENC, encoder.put()));
-    hav_instance->Link(dev_nvidia.get(), encoder.get());
+    ENCODER_DESC nvenc_desc;
+    nvenc_desc.codec = HV_CODEC_H264;
+    nvenc_desc.encoded_height = 2160;
+    nvenc_desc.encoded_width = 3840;
+    nvenc_desc.max_encoded_height = 3840;
+    nvenc_desc.max_encoded_width = 2160;
 
+    winrt::com_ptr<IPacket> pckt;
+    winrt::com_ptr<IEncoder> encoder;
+    winrt::check_hresult(hav_instance->CreateEncoder(IID_HAV_NVENC, nvenc_desc, dev_nvidia.get(), encoder.put()));
+    hav_instance->CreatePacket(IID_HAV_FFMPEGPacket, pckt.put());
     winrt::com_ptr<FFMPEGMuxer> ffmpeg_muxer = winrt::make_self<FFMPEGMuxer>();
     ffmpeg_muxer->VideoStream();
     unsigned int size = 0;
@@ -240,7 +247,9 @@ void DesktopDuplication(THREAD_PARAMS par)
             if (SUCCEEDED(hr)) hr = pdxgi_swpch->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pd3d11_bkbuffer);
             pd3d11_ctx->CopyResource(pd3d11_bkbuffer, out_tex);
             nv_frame->CommitFrame();
-            encoder->Encode(nv_frame.get(), buf, size);
+            encoder->Encode(nv_frame.get());
+            encoder->GetEncodedPacket(pckt.get());
+            ffmpeg_muxer->Stream(pckt.get());
             pdxgi_swpch->Present(1, 0);
             pd3d11_bkbuffer->Release();
         }

@@ -2,6 +2,7 @@
 #include "IDecoder.hpp"
 #include "HAVUtilsPrivate.hpp"
 #include "NVFrame.hpp"
+#include "IPacket.hpp"
 
 struct NVDEC : winrt::implements<NVDEC, IDecoder>
 {

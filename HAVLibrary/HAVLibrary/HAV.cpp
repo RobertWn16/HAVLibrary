@@ -16,9 +16,6 @@ winrt::hresult HAV::Link(IHAVComponent* In, IHAVComponent* Out)
         }
 
         NVENC* nv_encoder = dynamic_cast<NVENC*>(Out);
-        if (nv_encoder) {
-            nv_encoder->ConfigureEncoder(dev_nvidia->GetContext());
-        }
         return E_INVALIDARG;
     }
 
@@ -144,16 +141,20 @@ winrt::hresult __stdcall HAV::CreateDecoder(REFIID iid, IDecoder** Out)
     return E_NOINTERFACE;
 }
 
-winrt::hresult __stdcall HAV::CreateEncoder(REFIID iid, IEncoder** Out)
+winrt::hresult __stdcall HAV::CreateEncoder(REFIID iid, ENCODER_DESC encoder_desc, IDev* dev, IEncoder** Out)
 {
-    winrt::com_ptr<IEncoder> enc_ptr;
     if (IsEqualIID(iid, IID_HAV_NVENC)) {
         try {
+            DevNVIDIA* dev_nvidia = dynamic_cast<DevNVIDIA*>(dev);
+            winrt::check_pointer(dev_nvidia);
+
+            winrt::com_ptr<NVENC> nvenc_ptr;
             winrt::check_pointer(Out);
-            enc_ptr = winrt::make_self<NVENC>();
-            winrt::check_pointer(enc_ptr.get());
-            *Out = enc_ptr.get();
-            enc_ptr.detach();
+            nvenc_ptr = winrt::make_self<NVENC>();
+            winrt::check_pointer(nvenc_ptr.get());
+            nvenc_ptr->ConfigureEncoder(encoder_desc, dev_nvidia->GetContext());
+            *Out = nvenc_ptr.get();
+            nvenc_ptr.detach();
             return S_OK;
         }
         catch (winrt::hresult_error const& err) {
@@ -182,4 +183,24 @@ winrt::hresult __stdcall HAV::CreateFrame(REFIID iid, FRAME_OUTPUT_DESC frame_de
             return err.code();
         }
     }
+}
+
+winrt::hresult __stdcall HAV::CreatePacket(REFIID iid, IPacket** Out)
+{
+    if (IsEqualIID(iid, IID_HAV_FFMPEGPacket))
+    {
+        winrt::com_ptr<FFMPEGPacket> frame_ptr;
+        try {
+            winrt::check_pointer(Out);
+            frame_ptr = winrt::make_self<FFMPEGPacket>();
+            winrt::check_pointer(frame_ptr.get());
+            *Out = frame_ptr.get();
+            frame_ptr.detach();
+            return S_OK;
+        }
+        catch (winrt::hresult_error const& err) {
+            return err.code();
+        }
+    }
+    return winrt::hresult();
 }
