@@ -9,6 +9,7 @@ struct FFMPEGMuxer : winrt::implements<FFMPEGMuxer, IMuxer>
 	AVFormatContext* oc = NULL;
 	AVStream* vs = NULL;
 	AVPacket* pkt;
+	AVStream* st;
 	FILE* out;
 public:
 	~FFMPEGMuxer();

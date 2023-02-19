@@ -15,6 +15,10 @@ struct ENCODER_DESC
 	unsigned int encoded_height;
 	unsigned int max_encoded_width;
 	unsigned int max_encoded_height;
+	unsigned int framerate_num;
+	unsigned int framerate_den;
+	unsigned int num_in_back_buffers;
+	unsigned int num_out_back_buffers;
 };
 
 class __declspec(uuid("E4EA258B-86C8-4528-9AFE-C1DCE01ACB1A")) IEncoder : public IHAVComponent

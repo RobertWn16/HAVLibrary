@@ -20,6 +20,10 @@ winrt::com_ptr<HAV> hav_instance = winrt::make_self<HAV>();
 winrt::com_ptr<IDev> dev_nvidia;
 winrt::com_ptr<IVideoSource> display_source;
 
+winrt::com_ptr<IPacket> pckt;
+winrt::com_ptr<IEncoder> encoder;
+winrt::com_ptr<FFMPEGMuxer> ffmpeg_muxer;
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
@@ -133,14 +137,15 @@ void DecodeMain(IDecoder* dec, THREAD_PARAMS &par,  VIDEO_SOURCE_DESC vsrc_desc)
     while (!par.windowIsClosed) {
         try {
             SYSTEMTIME start, stop;
+
             GetSystemTime(&start);
             winrt::check_hresult(dec->Decode(nv_frame.get()));
-            Sleep(10);
-            winrt::check_hresult(nv_frame->ConvertFormat(HV_FORMAT_RGBA8, rgba_frame.get()));
             cudaDeviceSynchronize();
             GetSystemTime(&stop);
-
             std::cout << "Time elapsed is " << stop.wMilliseconds - start.wMilliseconds << std::endl;
+
+            winrt::check_hresult(nv_frame->ConvertFormat(HV_FORMAT_RGBA8, rgba_frame.get()));
+ 
             winrt::check_hresult(rgba_frame->CommitResource());
             if (SUCCEEDED(hr)) hr = pdxgi_swpch->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pd3d11_bkbuffer);
             pd3d11_ctx->CopyResource(pd3d11_bkbuffer, pd3d11_cuda_shresource);
@@ -159,7 +164,7 @@ void DecodeMainLoop(THREAD_PARAMS par)
     winrt::com_ptr<IVideoSource> source;
     winrt::com_ptr<IDecoder> dec;
     winrt::com_ptr<IDecoder> nvjpeg_decoder;
-    cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync);
+    //cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync);
     VIDEO_SOURCE_DESC vsrc_desc = { 0 };
     try {
         winrt::check_hresult(hav_instance->CreateDecoder(IID_HAV_NVDEC, dec.put()));
@@ -190,29 +195,10 @@ void DesktopDuplication(THREAD_PARAMS par)
     winrt::com_ptr<IFrame> nv_frame;
     IDXGISwapChain1* pdxgi_swpch = nullptr;
     HRESULT hr = S_OK;
+    ID3D11Texture2D* out_tex = nullptr;
     DXGI_SWAP_CHAIN_DESC1 dxgi_desc = { };
     DXGI_SWAP_CHAIN_FULLSCREEN_DESC dxgi_desc_fs = { };
-    ID3D11Texture2D* out_tex = nullptr;
-    ID3D11Texture2D* pd3d11_bkbuffer = nullptr;
-    dxgi_desc.BufferCount = 3;
-    dxgi_desc.Format = DXGI_FORMAT_R10G10B10A2_UNORM;
-    dxgi_desc.BufferUsage = DXGI_USAGE_BACK_BUFFER;
-    dxgi_desc.SampleDesc.Count = 1;      //multisampling setting
-    dxgi_desc.SampleDesc.Quality = 0;    //vendor-specific flag
-    dxgi_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
-    dxgi_desc.Scaling = DXGI_SCALING_STRETCH;
 
-    dxgi_desc_fs.RefreshRate.Numerator = 1;
-    dxgi_desc_fs.RefreshRate.Denominator = 60;
-    dxgi_desc_fs.Scaling = DXGI_MODE_SCALING_STRETCHED;
-    dxgi_desc_fs.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_PROGRESSIVE;
-    dxgi_desc_fs.Windowed = true;
-
-    hr = pdxgi_fty->CreateSwapChainForHwnd(pd3d11_dev, par.hwnd, &dxgi_desc, NULL, NULL, &pdxgi_swpch);
-    DXGI_RGBA rgba = { };
-    rgba.a = 255;
-
-    hr = pdxgi_swpch->ResizeBuffers(3, 3840, 2160, DXGI_FORMAT_B8G8R8A8_UNORM, 0);
     FRAME_OUTPUT_DESC frame_desc = {};
     frame_desc.format = HV_FORMAT_BGRA32;
     frame_desc.width = 3840;
@@ -231,30 +217,42 @@ void DesktopDuplication(THREAD_PARAMS par)
     nvenc_desc.encoded_width = 3840;
     nvenc_desc.max_encoded_height = 3840;
     nvenc_desc.max_encoded_width = 2160;
+    nvenc_desc.preset = HV_ENCODER_LOW_QUALITY_H264;
+    nvenc_desc.framerate_num = 60;
+    nvenc_desc.framerate_den = 1;
+    nvenc_desc.num_in_back_buffers = 1;
+    nvenc_desc.num_out_back_buffers = 2;
 
-    winrt::com_ptr<IPacket> pckt;
-    winrt::com_ptr<IEncoder> encoder;
     winrt::check_hresult(hav_instance->CreateEncoder(IID_HAV_NVENC, nvenc_desc, dev_nvidia.get(), encoder.put()));
     hav_instance->CreatePacket(IID_HAV_FFMPEGPacket, pckt.put());
-    winrt::com_ptr<FFMPEGMuxer> ffmpeg_muxer = winrt::make_self<FFMPEGMuxer>();
-    ffmpeg_muxer->VideoStream();
+
     unsigned int size = 0;
     unsigned char* buf = new unsigned char[100000];
+    ffmpeg_muxer->VideoStream();
+    SYSTEMTIME start, stop;
     while (!par.windowIsClosed) {
         try {
-
             display_source->Parse(&out_tex);
-            if (SUCCEEDED(hr)) hr = pdxgi_swpch->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pd3d11_bkbuffer);
-            pd3d11_ctx->CopyResource(pd3d11_bkbuffer, out_tex);
             nv_frame->CommitFrame();
             encoder->Encode(nv_frame.get());
-            encoder->GetEncodedPacket(pckt.get());
-            ffmpeg_muxer->Stream(pckt.get());
-            pdxgi_swpch->Present(1, 0);
-            pd3d11_bkbuffer->Release();
         }
         catch (winrt::hresult_error const& err) {
             std::cout << err.code();
+        }
+    }
+}
+
+void StreamLoop(THREAD_PARAMS par)
+{
+    HRESULT hr = S_OK;
+
+    while (!par.windowIsClosed) {
+        if (pckt.get())
+        {
+
+            hr = encoder->GetEncodedPacket(pckt.get());
+            if(SUCCEEDED(hr))
+                ffmpeg_muxer->Stream(pckt.get());
         }
     }
 }
@@ -350,7 +348,7 @@ int main(int argc, char** argv)
     dev_desc.ordinal = 0;
 
     winrt::com_ptr<IDisplay> display;
-
+    ffmpeg_muxer = winrt::make_self<FFMPEGMuxer>();
     winrt::check_hresult(hav_instance->CreateDevice(IID_HAV_NVDev, dev_desc, dev_nvidia.put()));
     winrt::check_hresult(hav_instance->CreateDemuxer(IID_HAV_FFMPEGDemuxer, demx.put()));
     winrt::check_hresult(hav_instance->CreateDisplay(IID_HAV_WinDisplay, display.put()));
@@ -358,23 +356,31 @@ int main(int argc, char** argv)
     display->DisplayCapture(display_source.put());
     THREAD_PARAMS par;
 
-    /*par.hwnd = core_hwnd;
-    par.name = "http://10.1.1.20:8080";
-    HANDLE hThread = CreateThread(nullptr,
-        0,
-        reinterpret_cast<LPTHREAD_START_ROUTINE>(DecodeMainLoop),
-        &par,
-        0,
-        nullptr);*/
-    par.hwnd = core_hwnd;
-
-    HANDLE hThread = CreateThread(nullptr,
+    par.windowIsClosed = false;
+    HANDLE hThread[3];
+    hThread[0] = CreateThread(nullptr,
         0,
         reinterpret_cast<LPTHREAD_START_ROUTINE>(DesktopDuplication),
         &par,
         0,
         nullptr);
 
+    hThread[1] = CreateThread(nullptr,
+        0,
+        reinterpret_cast<LPTHREAD_START_ROUTINE>(StreamLoop),
+        &par,
+        0,
+        nullptr);
+
+    /*par.hwnd = core_hwnd;
+    par.name = "sample.mp4";
+    par.windowIsClosed = false;
+    hThread[2] = CreateThread(nullptr,
+        0,
+        reinterpret_cast<LPTHREAD_START_ROUTINE>(DecodeMainLoop),
+        &par,
+        0,
+        nullptr);*/
 
     while (GetMessageW(&Msg, nullptr, 0, 0))
     {
@@ -383,5 +389,5 @@ int main(int argc, char** argv)
     }
 
     par.windowIsClosed = true;
-    //WaitForSingleObject(hThread, INFINITE);
+    WaitForMultipleObjects(2, hThread, true, INFINITE);
 }
