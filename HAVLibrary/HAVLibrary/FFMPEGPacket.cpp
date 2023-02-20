@@ -2,11 +2,14 @@
 
 void FFMPEGPacket::RecievePacket(AVPacket* inPacket)
 {
-	if (pkt)
-	{
-		if (pkt->data)
-			av_packet_unref(pkt);
-	}
+	if (ffmpegPack)
+		if (ffmpegPack->data)
+			av_packet_unref(ffmpegPack);
+	ffmpegPack = av_packet_clone(inPacket);
+}
 
-	pkt = av_packet_clone(inPacket);
+AVPacket* FFMPEGPacket::GetPacket()
+{
+	return ffmpegPack;
+	return nullptr;
 }

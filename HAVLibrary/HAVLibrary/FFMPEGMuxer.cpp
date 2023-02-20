@@ -2,52 +2,51 @@
 
 FFMPEGMuxer::~FFMPEGMuxer()
 {
-    av_write_trailer(oc);
-    avformat_free_context(oc);
 }
 
-winrt::hresult FFMPEGMuxer::VideoStream()
+static const char* HVConAVCon(HVContainer hvContainer)
 {
-    int err = 0;
-    AVDictionary* options = NULL;
-
-    const AVOutputFormat* fmt = nullptr;
-    AVCodecParameters* c;
-
-    char* filename = (char*)"tcp://127.0.0.1:8080/live.h264?listen";
-    avformat_network_init();
-
-    err = avformat_alloc_output_context2(&oc, NULL, "h264", filename);
-    st = avformat_new_stream(oc, nullptr);
-
-    st->id = 0;
-    st->codecpar->codec_id = AV_CODEC_ID_H264;
-    st->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
-    st->codecpar->width = 3840;
-    st->codecpar->height = 2160;
-    st->time_base.num = 1;
-    st->time_base.den = 60;
-    err = av_dict_set(&options, "codec", "copy", 0);
-    err = avio_open2(&oc->pb, filename, AVIO_FLAG_WRITE, nullptr, &options);
-    oc->video_codec_id = AV_CODEC_ID_H264;
-
-    oc->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
-    err = avformat_write_header(oc, nullptr);
-
-
-    av_dump_format(oc, 0, "filename", 1);
-    return S_OK;
+    switch (hvContainer)
+    {
+    case HV_CONTAINER_MP4:
+        return "mp4";
+        break;
+    case HV_CONTAINER_MKV:
+        return "mkv";
+        break;
+    case HV_CONTAINER_WEBM:
+        return "webm";
+        break;
+    case HV_CONTAINER_MPEGTS:
+        return "mpegts";
+        break;
+    case HV_CONTAINER_H264:
+        return "h264";
+        break;
+    case HV_CONTAINER_HEVC:
+        return "hevc";
+        break;
+    default:
+        break;
+    }
 }
 
-winrt::hresult FFMPEGMuxer::Stream(IPacket* inPkt)
+winrt::hresult FFMPEGMuxer::VideoStream(std::string path, VIDEO_OUTPUT_DESC outDesc, IVideoOutput** out)
 {
-    static int nPts = 0;
-    int err = 0;
-    FFMPEGPacket* ffmpeg_pkt = dynamic_cast<FFMPEGPacket*>(inPkt);
-    ffmpeg_pkt->pkt->pts = av_rescale_q(nPts++, AVRational{ 1, 60 }, st->time_base);
-    ffmpeg_pkt->pkt->dts = ffmpeg_pkt->pkt->pts;
-    ffmpeg_pkt->pkt->stream_index = 0;
-    err = av_write_frame(oc, ffmpeg_pkt->pkt);
-    err = av_write_frame(oc, nullptr);
+    try
+    {
+        AVFormatContext* oc = nullptr;
+        AVOutputFormat* fmt = nullptr;
+        avformat_alloc_output_context2(&oc, nullptr, "h264", path.c_str());
+        oc->url = path.data();
+        winrt::com_ptr<FFMPEGVideoOutput> video_out = winrt::make_self<FFMPEGVideoOutput>();
+        winrt::check_pointer(video_out.get());
+        video_out->ConfigureVideoOutput(oc, outDesc);
+        *out = video_out.detach();
+    } catch (winrt::hresult_error const& err)
+    {
+        return err.code();
+    }
+    
     return S_OK;
 }

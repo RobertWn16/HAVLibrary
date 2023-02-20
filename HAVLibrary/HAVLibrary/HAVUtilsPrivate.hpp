@@ -16,14 +16,7 @@ extern "C"
 #pragma comment(lib, "cuda")
 
 
-static winrt::hresult AVHr(int avcode)
-{
-	char buf[BUFSIZ];
-	av_strerror(avcode, buf, AV_ERROR_MAX_STRING_SIZE);
-	if (avcode < 0)
-		return E_FAIL;
-	return S_OK;
-}
+winrt::hresult AVHr(int avcode);
 
 static HVCodec AVCOHAV(int avcodec)
 {

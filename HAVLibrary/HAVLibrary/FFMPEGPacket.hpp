@@ -4,7 +4,8 @@
 struct FFMPEGPacket : winrt::implements<FFMPEGPacket, IPacket>
 {
 public:
-	AVPacket* pkt;
+	AVPacket* ffmpegPack;
 public:
 	void RecievePacket(AVPacket* inPacket);
+	AVPacket* GetPacket();
 };

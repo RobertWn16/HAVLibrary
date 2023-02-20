@@ -21,7 +21,7 @@ winrt::hresult WinDisplayVideoSource::Parse(ID3D11Texture2D **Out) noexcept
     HRESULT hr = S_OK;
     try
     {
-        hr = pwdsOutputDupl->AcquireNextFrame(200, &outdpl_frame_info, pwdsDxgiResource.put());
+        hr = pwdsOutputDupl->AcquireNextFrame(INFINITE, &outdpl_frame_info, pwdsDxgiResource.put());
         winrt::check_pointer(pwdsDxgiResource.get());
         pwdsDxgiResource.as(pwdsBufTex);
         pwdsBufTex->GetDesc(&desc);
