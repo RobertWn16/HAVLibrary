@@ -11,7 +11,7 @@ winrt::hresult WinDisplayVideoSource::Parse(void* desc)
 {
     return winrt::hresult();
 }
-
+SYSTEMTIME start, stop;
 winrt::hresult WinDisplayVideoSource::Parse(ID3D11Texture2D **Out) noexcept
 {
     DXGI_OUTDUPL_FRAME_INFO outdpl_frame_info = { 0 };
@@ -21,7 +21,9 @@ winrt::hresult WinDisplayVideoSource::Parse(ID3D11Texture2D **Out) noexcept
     HRESULT hr = S_OK;
     try
     {
-        hr = pwdsOutputDupl->AcquireNextFrame(INFINITE, &outdpl_frame_info, pwdsDxgiResource.put());
+        hr = pwdsOutputDupl->AcquireNextFrame(400, &outdpl_frame_info, pwdsDxgiResource.put());
+
+        GetSystemTime(&start);
         winrt::check_pointer(pwdsDxgiResource.get());
         pwdsDxgiResource.as(pwdsBufTex);
         pwdsBufTex->GetDesc(&desc);
