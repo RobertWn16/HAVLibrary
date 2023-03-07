@@ -48,7 +48,7 @@ NVENC::~NVENC()
 }
 winrt::hresult NVENC::IsSupported(VIDEO_SOURCE_DESC desc)
 {
-    return winrt::hresult();
+    return S_OK;
 }
 
 winrt::hresult NVENC::Encode(IFrame* inFrame)
@@ -208,7 +208,7 @@ winrt::hresult NVENC::ConfigureEncoder(ENCODER_DESC nvDesc, CUcontext deviceCont
 
             NV_ENC_REGISTER_RESOURCE nv_enc_resource = { NV_ENC_REGISTER_RESOURCE_VER };
             nv_enc_resource.resourceType = NV_ENC_INPUT_RESOURCE_TYPE_CUDADEVICEPTR;
-            nv_enc_resource.bufferFormat = NV_ENC_BUFFER_FORMAT_ABGR;
+            nv_enc_resource.bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;
             nv_enc_resource.resourceToRegister = (void*)nvencFrame[i];
             nv_enc_resource.width = nvencDesc.encoded_width;
             nv_enc_resource.height = nvencDesc.encoded_height;

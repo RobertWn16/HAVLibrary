@@ -36,7 +36,7 @@ winrt::hresult FFMPEGVideoOutput::ConfigureVideoOutput(AVFormatContext* oc, VIDE
 	}
     return winrt::hresult();
 }
-extern SYSTEMTIME start, stop;
+
 winrt::hresult FFMPEGVideoOutput::Write(IPacket* inPck)
 {
     try
@@ -47,8 +47,6 @@ winrt::hresult FFMPEGVideoOutput::Write(IPacket* inPck)
         ffmpeg_internal_packet->pts = av_rescale_q(ffmpegPts++, { 1, ffmpegFps }, ffmpegOutputStream->time_base);
         ffmpeg_internal_packet->dts = ffmpeg_internal_packet->pts;
         ffmpeg_internal_packet->stream_index = 0;
-        GetSystemTime(&stop);
-        std::cout << "Time elapsed... " << stop.wMilliseconds - start.wMilliseconds << std::endl;
         av_write_frame(ffmpegOutputContext, ffmpeg_internal_packet);
         av_write_frame(ffmpegOutputContext, nullptr);
 

@@ -74,10 +74,10 @@
 
         VIDEO_OUTPUT_DESC vout_desc;
         vout_desc.codec = HV_CODEC_H264;
-        vout_desc.container = HV_CONTAINER_MP4;
+        vout_desc.container = HV_CONTAINER_H264;
         vout_desc.width = 3840;
         vout_desc.height = 2160;
-        ffmpeg_muxer->VideoStream("tcp://127.0.0.1:8080/live.h264?listen", vout_desc, vout.put());
+        ffmpeg_muxer->VideoStream("tcp://10.1.1.124:8080/live.h264?listen", vout_desc, vout.put());
 
         SYSTEMTIME start, stop;
         while (!par.windowIsClosed) {
@@ -272,7 +272,7 @@ void DecodeMain(IDecoder* dec, THREAD_PARAMS& par, VIDEO_SOURCE_DESC vsrc_desc) 
             winrt::check_hresult(rgba_frame->CommitResource());
             if (SUCCEEDED(hr)) hr = pdxgi_swpch->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pd3d11_bkbuffer);
             pd3d11_ctx->CopyResource(pd3d11_bkbuffer, pd3d11_cuda_shresource);
-            pdxgi_swpch->Present(1, 0);
+            pdxgi_swpch->Present(0, 0);
             pd3d11_bkbuffer->Release();
         }
         catch (winrt::hresult_error const& err) {
@@ -391,7 +391,7 @@ int main(int argc, char** argv)
     UpdateWindow(core_hwnd);
 
     THREAD_PARAMS par;
-    par.name = "tcp://127.0.0.1:8080/live.h264";
+    par.name = "tcp://10.1.1.124:8080/live.h264";
     par.hwnd = core_hwnd;
     par.windowIsClosed = false;
     HANDLE hThread = CreateThread(nullptr,

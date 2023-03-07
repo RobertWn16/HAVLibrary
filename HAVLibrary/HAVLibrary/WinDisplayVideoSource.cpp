@@ -19,11 +19,24 @@ winrt::hresult WinDisplayVideoSource::Parse(ID3D11Texture2D **Out) noexcept
     winrt::com_ptr<ID3D11Texture2D> pwdsBufTex;
     D3D11_TEXTURE2D_DESC desc;
     HRESULT hr = S_OK;
-    try
-    {
-        hr = pwdsOutputDupl->AcquireNextFrame(400, &outdpl_frame_info, pwdsDxgiResource.put());
 
-        GetSystemTime(&start);
+    hr = pwdsOutputDupl->AcquireNextFrame(400, &outdpl_frame_info, pwdsDxgiResource.put());
+    switch (hr)
+    {
+    case DXGI_ERROR_ACCESS_LOST:
+        pwdsOutputDupl.detach()->Release();
+        hr = pwdsOutput6->DuplicateOutput(pwdsDevice, pwdsOutputDupl.put());
+        return hr;
+        break;
+    case DXGI_ERROR_WAIT_TIMEOUT:
+        return ERROR_TIMEOUT;
+        break;
+    default:
+        return E_UNEXPECTED;
+        break;
+    }
+
+    try {
         winrt::check_pointer(pwdsDxgiResource.get());
         pwdsDxgiResource.as(pwdsBufTex);
         pwdsBufTex->GetDesc(&desc);
@@ -35,21 +48,24 @@ winrt::hresult WinDisplayVideoSource::Parse(ID3D11Texture2D **Out) noexcept
         return err.code();
     }
 
-
     return S_OK;
 }
 
-winrt::hresult WinDisplayVideoSource::ConfigureVideoSource(VIDEO_SOURCE_DESC vsrc_desc, ID3D11Device* pDevice, IDXGIOutputDuplication* pOutputDupl)
+winrt::hresult WinDisplayVideoSource::ConfigureVideoSource(VIDEO_SOURCE_DESC vsrc_desc, ID3D11Device* pDevice, IDXGIOutput6* pdxgiOutput)
 {
     winrt::com_ptr<IDXGIDevice> pwdsDxgiDevice;
+    IDXGIOutputDuplication* pdxgiOutputDupl = nullptr;
     try {  
+        winrt::check_pointer(pdxgiOutput);
+        pwdsOutput6 = pdxgiOutput;
         winrt::check_pointer(pDevice);
         pwdsDevice = pDevice;
         pwdsDevice->GetImmediateContext(&pwdsDeviceCtx);
         winrt::check_pointer(&pwdsDeviceCtx);
 
-        winrt::check_pointer(pOutputDupl);
-        pwdsOutputDupl.attach(pOutputDupl);
+        winrt::check_pointer(pdxgiOutput);
+        pdxgiOutput->DuplicateOutput(pDevice, &pdxgiOutputDupl);
+        pwdsOutputDupl.attach(pdxgiOutputDupl);
         video_source_desc = vsrc_desc;
 
         DXGI_OUTDUPL_DESC outdupl_desc = { 0 };

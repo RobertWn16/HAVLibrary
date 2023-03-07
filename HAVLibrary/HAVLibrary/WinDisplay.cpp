@@ -41,11 +41,9 @@ winrt::hresult WinDisplay::ConfigureDisplay() noexcept
 winrt::hresult WinDisplay::DisplayCapture(IVideoSource** out) noexcept
 {
     winrt::com_ptr<WinDisplayVideoSource> pwdVideoSource;
-    IDXGIOutputDuplication *pwdOutputDuplication;
     VIDEO_SOURCE_DESC vsrc_desc = { 0 };
 
     try {
-        winrt::check_hresult(pwdOutput6->DuplicateOutput(pwdDevice.get(), &pwdOutputDuplication));
         pwdVideoSource = winrt::make_self<WinDisplayVideoSource>();
         winrt::check_pointer(pwdVideoSource.get());
 
@@ -55,7 +53,7 @@ winrt::hresult WinDisplay::DisplayCapture(IVideoSource** out) noexcept
         vsrc_desc.avg_content_luminance = display_desc.avg_display_luminance;
         vsrc_desc.format = DXGIFmtHV(DXGI_FORMAT_B8G8R8A8_UNORM);
 
-        pwdVideoSource->ConfigureVideoSource(vsrc_desc, pwdDevice.get(), pwdOutputDuplication);
+        pwdVideoSource->ConfigureVideoSource(vsrc_desc, pwdDevice.get(), pwdOutput6.get());
         *out = pwdVideoSource.detach();
     }catch (winrt::hresult_error const& err) {
         return err.code();

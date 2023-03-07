@@ -37,7 +37,7 @@ winrt::hresult FFMPEGMuxer::VideoStream(std::string path, VIDEO_OUTPUT_DESC outD
     {
         AVFormatContext* oc = nullptr;
         AVOutputFormat* fmt = nullptr;
-        avformat_alloc_output_context2(&oc, nullptr, "h264", path.c_str());
+        avformat_alloc_output_context2(&oc, nullptr, HVConAVCon(outDesc.container), path.c_str());
         oc->url = path.data();
         winrt::com_ptr<FFMPEGVideoOutput> video_out = winrt::make_self<FFMPEGVideoOutput>();
         winrt::check_pointer(video_out.get());
