@@ -14,6 +14,7 @@ extern "C"
 #include <d3d11.h>
 #pragma comment(lib, "nvcuvid")
 #pragma comment(lib, "cuda")
+#pragma comment(lib, "d3d11")
 
 
 winrt::hresult AVHr(int avcode);
@@ -46,13 +47,6 @@ static HVCodec AVCOHAV(int avcodec)
 
 	return HV_CODEC_UNSUPPORTED;
 }
-
-struct PACKET_DESC
-{
-	void* data;
-	int32_t size;
-	int32_t timestamp;
-};
 
 HVFormat DXGIFmtHV(DXGI_FORMAT dxgi_format);
 HVColorSpace DXGICsHV(DXGI_COLOR_SPACE_TYPE dxgi_colorspace);

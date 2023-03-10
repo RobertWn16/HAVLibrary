@@ -1,5 +1,6 @@
 #pragma once
 #include "IPacket.hpp"
+#include "HAVUtilsPrivate.hpp"
 
 struct FFMPEGPacket : winrt::implements<FFMPEGPacket, IPacket>
 {

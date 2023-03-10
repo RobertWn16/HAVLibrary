@@ -1,5 +1,5 @@
 #pragma once
-#include "IVIdeoSource.hpp"
+#include "IPacket.hpp"
 #include "IDecoder.hpp"
 #include "HAVUtilsPrivate.hpp"
 

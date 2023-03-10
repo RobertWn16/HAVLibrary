@@ -87,6 +87,26 @@ winrt::hresult __stdcall HAV::CreateDemuxer(REFIID iid, IDemuxer** Out)
     return E_NOINTERFACE;
 }
 
+winrt::hresult __stdcall HAV::CreateMuxer(REFIID iid, IMuxer** Out)
+{
+    if (IsEqualIID(iid, IID_HAV_FFMPEGMuxer))
+    {
+        winrt::com_ptr<FFMPEGMuxer> display_ptr;
+        try {
+            winrt::check_pointer(Out);
+            display_ptr = winrt::make_self<FFMPEGMuxer>();
+            winrt::check_pointer(display_ptr.get());
+            *Out = display_ptr.get();
+            display_ptr.detach();
+            return S_OK;
+        }
+        catch (winrt::hresult_error const& err) {
+            return err.code();
+        }
+    }
+    return winrt::hresult();
+}
+
 winrt::hresult __stdcall HAV::CreateDisplay(REFIID iid, IDisplay** Out)
 {
     if (IsEqualIID(iid, IID_HAV_WinDisplay))

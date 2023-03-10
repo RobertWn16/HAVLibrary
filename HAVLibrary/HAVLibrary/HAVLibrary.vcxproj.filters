@@ -72,6 +72,9 @@
     <ClCompile Include="FFMPEGVideoOutput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="HAVFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IMuxer.hpp">
@@ -167,10 +170,18 @@
     <ClInclude Include="FFMPEGVideoOutput.hpp">
       <Filter>Private</Filter>
     </ClInclude>
+    <ClInclude Include="HAVFactory.hpp">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="ColorSpaceConversion.cu">
       <Filter>CuKernels</Filter>
     </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HAV.def">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

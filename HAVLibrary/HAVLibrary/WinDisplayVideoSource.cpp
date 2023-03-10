@@ -32,7 +32,6 @@ winrt::hresult WinDisplayVideoSource::Parse(ID3D11Texture2D **Out) noexcept
         return ERROR_TIMEOUT;
         break;
     default:
-        return E_UNEXPECTED;
         break;
     }
 

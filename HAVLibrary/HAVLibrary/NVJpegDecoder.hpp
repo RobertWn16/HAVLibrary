@@ -1,4 +1,5 @@
 #pragma once
+#include "IPacket.hpp"
 #include "IDecoder.hpp"
 #include "HAVUtilsPrivate.hpp"
 #include "NVFrame.hpp"
