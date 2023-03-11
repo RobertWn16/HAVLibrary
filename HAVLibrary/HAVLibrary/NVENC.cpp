@@ -86,8 +86,8 @@ winrt::hresult NVENC::Encode(IFrame* inFrame)
             pic_params.pictureStruct = NV_ENC_PIC_STRUCT_FRAME;
             pic_params.bufferFmt = NV_ENC_BUFFER_FORMAT_ABGR;
             pic_params.inputBuffer = nvencMappedResource[nvencTxInIndex];
-            pic_params.inputHeight = 2160;
-            pic_params.inputWidth = 3840;
+            pic_params.inputHeight = nvframeDesc.height;
+            pic_params.inputWidth = nvframeDesc.width;
             pic_params.inputPitch = 0;
             pic_params.encodePicFlags = NV_ENC_PIC_FLAG_OUTPUT_SPSPPS;
             pic_params.completionEvent = nvencCompletedFrame[nvencTxOutIndex];
@@ -178,8 +178,9 @@ winrt::hresult NVENC::ConfigureEncoder(ENCODER_DESC nvDesc, CUcontext deviceCont
         nvencParams.encodeGUID = HVCodecNVENCodec(nvencDesc.codec);
         nvencParams.encodeWidth = nvencDesc.encoded_width;
         nvencParams.encodeHeight = nvencDesc.encoded_height;
-        nvencParams.maxEncodeHeight = nvencDesc.max_encoded_width;
-        nvencParams.maxEncodeWidth = nvencDesc.max_encoded_height;
+  
+        nvencParams.maxEncodeHeight = nvencDesc.max_encoded_height;
+        nvencParams.maxEncodeWidth = nvencDesc.max_encoded_width;
         nvencParams.darWidth = nvencDesc.encoded_width;
         nvencParams.darHeight = nvencDesc.encoded_height;
         nvencParams.enableEncodeAsync = true;

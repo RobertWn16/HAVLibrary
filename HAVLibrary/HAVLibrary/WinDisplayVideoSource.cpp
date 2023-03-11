@@ -4,7 +4,8 @@ constexpr int MAX_TIMEOUT = 100;
 
 winrt::hresult WinDisplayVideoSource::GetDesc(VIDEO_SOURCE_DESC& desc)
 {
-    return winrt::hresult();
+    desc = video_source_desc;
+    return S_OK;
 }
 
 winrt::hresult WinDisplayVideoSource::Parse(void* desc)
@@ -66,12 +67,12 @@ winrt::hresult WinDisplayVideoSource::ConfigureVideoSource(VIDEO_SOURCE_DESC vsr
         pdxgiOutput->DuplicateOutput(pDevice, &pdxgiOutputDupl);
         pwdsOutputDupl.attach(pdxgiOutputDupl);
         video_source_desc = vsrc_desc;
-
-        DXGI_OUTDUPL_DESC outdupl_desc = { 0 };
+    
+        DXGI_OUTDUPL_DESC outdupl_desc = {0};
         pwdsOutputDupl->GetDesc(&outdupl_desc);
         video_source_desc.framerate = (double)(outdupl_desc.ModeDesc.RefreshRate.Numerator) / outdupl_desc.ModeDesc.RefreshRate.Denominator;
 
-        D3D11_TEXTURE2D_DESC tex_desc = { 0 };
+        D3D11_TEXTURE2D_DESC tex_desc = {0};
         tex_desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
         tex_desc.ArraySize = 1;
         tex_desc.MipLevels = 1;
