@@ -72,19 +72,19 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)ThirdParty\ffmpeg\include;$(SolutionDir)ThirdParty\NVIDIA_Video_SDK\Interface;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ThirdParty\ffmpeg\include;$(SolutionDir)ThirdParty\NVIDIA_Video_SDK\Interface;$(ProjectDir)\Interfaces;$(ProjectDir)\CuKernels;$(ProjectDir)\Private;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)ThirdParty\NVIDIA_Video_SDK\Lib;$(SolutionDir)ThirdParty\ffmpeg\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)ThirdParty\ffmpeg\include;$(SolutionDir)ThirdParty\NVIDIA_Video_SDK\Interface;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ThirdParty\ffmpeg\include;$(SolutionDir)ThirdParty\NVIDIA_Video_SDK\Interface;$(ProjectDir)\Interfaces;$(ProjectDir)\CuKernels;$(ProjectDir)\Private;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)ThirdParty\NVIDIA_Video_SDK\Lib;$(SolutionDir)ThirdParty\ffmpeg\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)ThirdParty\ffmpeg\include;$(SolutionDir)ThirdParty\NVIDIA_Video_SDK\Interface;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ThirdParty\ffmpeg\include;$(SolutionDir)ThirdParty\NVIDIA_Video_SDK\Interface;$(ProjectDir)\Interfaces;$(ProjectDir)\CuKernels;$(ProjectDir)\Private;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)ThirdParty\NVIDIA_Video_SDK\Lib;$(SolutionDir)ThirdParty\ffmpeg\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)ThirdParty\ffmpeg\include;$(SolutionDir)ThirdParty\NVIDIA_Video_SDK\Interface;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)ThirdParty\ffmpeg\include;$(SolutionDir)ThirdParty\NVIDIA_Video_SDK\Interface;$(ProjectDir)\Interfaces;$(ProjectDir)\CuKernels;$(ProjectDir)\Private;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)ThirdParty\NVIDIA_Video_SDK\Lib;$(SolutionDir)ThirdParty\ffmpeg\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -98,7 +98,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ModuleDefinitionFile>HAV.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>src/HAV.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -116,7 +116,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ModuleDefinitionFile>HAV.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>src/HAV.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -130,7 +130,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ModuleDefinitionFile>HAV.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>src/HAV.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -148,66 +148,66 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ModuleDefinitionFile>HAV.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>src/HAV.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DevNVIDIA.cpp" />
-    <ClCompile Include="FFMPEGMuxer.cpp" />
-    <ClCompile Include="FFMPEGPacket.cpp" />
-    <ClCompile Include="FFMPEGVideoOutput.cpp" />
-    <ClCompile Include="FFMPEGVideoSource.cpp" />
-    <ClCompile Include="FFMPEGDemuxer.cpp" />
-    <ClCompile Include="HAV.cpp" />
-    <ClCompile Include="HAVFactory.cpp" />
-    <ClCompile Include="HAVUtilsPrivate.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="NVDEC.cpp" />
-    <ClCompile Include="NVENC.cpp" />
-    <ClCompile Include="NVFrame.cpp" />
-    <ClCompile Include="NVJpegDecoder.cpp" />
-    <ClCompile Include="WinDisplay.cpp" />
-    <ClCompile Include="WinDisplayVideoSource.cpp" />
+    <ClCompile Include="src\DevNVIDIA.cpp" />
+    <ClCompile Include="src\FFMPEGDemuxer.cpp" />
+    <ClCompile Include="src\FFMPEGMuxer.cpp" />
+    <ClCompile Include="src\FFMPEGPacket.cpp" />
+    <ClCompile Include="src\FFMPEGVideoOutput.cpp" />
+    <ClCompile Include="src\FFMPEGVideoSource.cpp" />
+    <ClCompile Include="src\HAV.cpp" />
+    <ClCompile Include="src\HAVFactory.cpp" />
+    <ClCompile Include="src\HAVUtilsPrivate.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\NVDEC.cpp" />
+    <ClCompile Include="src\NVENC.cpp" />
+    <ClCompile Include="src\NVFrame.cpp" />
+    <ClCompile Include="src\NVJpegDecoder.cpp" />
+    <ClCompile Include="src\WinDisplay.cpp" />
+    <ClCompile Include="src\WinDisplayVideoSource.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="devNVIDIA.hpp" />
-    <ClInclude Include="FFMPEGMuxer.hpp" />
-    <ClInclude Include="FFMPEGPacket.hpp" />
-    <ClInclude Include="FFMPEGVideoOutput.hpp" />
-    <ClInclude Include="FFMPEGVideoSource.hpp" />
-    <ClInclude Include="FFMPEGDemuxer.hpp" />
-    <ClInclude Include="HAV.hpp" />
-    <ClInclude Include="HAVFactory.hpp" />
-    <ClInclude Include="HAVTypes.hpp" />
-    <ClInclude Include="HAVUtilsPrivate.hpp" />
-    <ClInclude Include="ColorSpaceConversion.cuh" />
-    <ClInclude Include="IDev.hpp" />
-    <ClInclude Include="IDisplay.hpp" />
-    <ClInclude Include="IEncoder.hpp" />
-    <ClInclude Include="IFrame.hpp" />
-    <ClInclude Include="IHAVComponent.hpp" />
-    <ClInclude Include="IPacket.hpp" />
-    <ClInclude Include="IVideoOutput.hpp" />
-    <ClInclude Include="IVIdeoSource.hpp" />
-    <ClInclude Include="IDecoder.hpp" />
-    <ClInclude Include="IDemuxer.hpp" />
-    <ClInclude Include="IHAV.hpp" />
-    <ClInclude Include="IMuxer.hpp" />
-    <ClInclude Include="IPresenter.hpp" />
-    <ClInclude Include="LUTS.cuh" />
-    <ClInclude Include="NVDEC.hpp" />
-    <ClInclude Include="NVENC.hpp" />
-    <ClInclude Include="NVFrame.hpp" />
-    <ClInclude Include="NVJpegDecoder.hpp" />
-    <ClInclude Include="pch.hpp" />
-    <ClInclude Include="WinDisplay.hpp" />
-    <ClInclude Include="WinDisplayVideoSource.hpp" />
+    <CudaCompile Include="CuKernels\ColorSpaceConversion.cuh" />
+    <ClInclude Include="CuKernels\LUTS.cuh" />
+    <ClInclude Include="Interfaces\HAVFactory.hpp" />
+    <ClInclude Include="Interfaces\IDecoder.hpp" />
+    <ClInclude Include="Interfaces\IDemuxer.hpp" />
+    <ClInclude Include="Interfaces\IDev.hpp" />
+    <ClInclude Include="Interfaces\IDisplay.hpp" />
+    <ClInclude Include="Interfaces\IEncoder.hpp" />
+    <ClInclude Include="Interfaces\IFrame.hpp" />
+    <ClInclude Include="Interfaces\IHAV.hpp" />
+    <ClInclude Include="Interfaces\IHAVComponent.hpp" />
+    <ClInclude Include="Interfaces\IMuxer.hpp" />
+    <ClInclude Include="Interfaces\IPacket.hpp" />
+    <ClInclude Include="Interfaces\IPresenter.hpp" />
+    <ClInclude Include="Interfaces\IVideoOutput.hpp" />
+    <ClInclude Include="Interfaces\IVIdeoSource.hpp" />
+    <ClInclude Include="Interfaces\pch.hpp" />
+    <ClInclude Include="Private\devNVIDIA.hpp" />
+    <ClInclude Include="Private\FFMPEGDemuxer.hpp" />
+    <ClInclude Include="Private\FFMPEGMuxer.hpp" />
+    <ClInclude Include="Private\FFMPEGPacket.hpp" />
+    <ClInclude Include="Private\FFMPEGVideoOutput.hpp" />
+    <ClInclude Include="Private\FFMPEGVideoSource.hpp" />
+    <ClInclude Include="Private\HAV.hpp" />
+    <ClInclude Include="Private\HAVTypes.hpp" />
+    <ClInclude Include="Private\HAVUtilsPrivate.hpp" />
+    <ClInclude Include="Private\NVDEC.hpp" />
+    <ClInclude Include="Private\NVENC.hpp" />
+    <ClInclude Include="Private\NVFrame.hpp" />
+    <ClInclude Include="Private\NVJpegDecoder.hpp" />
+    <ClInclude Include="Private\WinDisplay.hpp" />
+    <ClInclude Include="Private\WinDisplayVideoSource.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="ColorSpaceConversion.cu" />
+    <CudaCompile Include="CuKernels\ColorSpaceConversion.cu" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="HAV.def" />
+    <None Include="src\HAV.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
