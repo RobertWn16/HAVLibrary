@@ -107,7 +107,7 @@ winrt::hresult __stdcall HAV::CreateMuxer(REFIID iid, IMuxer** Out)
     return winrt::hresult();
 }
 
-winrt::hresult __stdcall HAV::CreateDisplay(REFIID iid, IDisplay** Out)
+winrt::hresult __stdcall HAV::CreateDisplay(REFIID iid, unsigned int index, IDisplay** Out)
 {
     if (IsEqualIID(iid, IID_HAV_WinDisplay))
     {
@@ -116,7 +116,7 @@ winrt::hresult __stdcall HAV::CreateDisplay(REFIID iid, IDisplay** Out)
             winrt::check_pointer(Out);
             display_ptr = winrt::make_self<WinDisplay>();
             winrt::check_pointer(display_ptr.get());
-            display_ptr->ConfigureDisplay();
+            display_ptr->ConfigureDisplay(index);
             *Out = display_ptr.get();
             display_ptr.detach();
             return S_OK;

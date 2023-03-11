@@ -1,6 +1,9 @@
 #include "WinDisplay.hpp"
-
-winrt::hresult WinDisplay::ConfigureDisplay() noexcept
+D3D_FEATURE_LEVEL featureLevels[] = {
+    D3D_FEATURE_LEVEL_11_0,
+    D3D_FEATURE_LEVEL_11_1
+};
+winrt::hresult WinDisplay::ConfigureDisplay(unsigned int index) noexcept
 {
     try {
         winrt::com_ptr<IDXGIFactory1> pwdFactory;
@@ -8,12 +11,12 @@ winrt::hresult WinDisplay::ConfigureDisplay() noexcept
         winrt::com_ptr<IDXGIDevice> pwdDxgiDevice;
         winrt::com_ptr<IDXGIOutput> pwdOutput;
         DXGI_OUTPUT_DESC1 output_desc1 = { 0 };
-
+        D3D_FEATURE_LEVEL level = { };
         winrt::check_hresult(CreateDXGIFactory1(IID_IDXGIFactory1, pwdFactory.put_void()));
         winrt::check_hresult(pwdFactory->EnumAdapters(0, pwdAdapter.put()));
         winrt::check_hresult(D3D11CreateDevice(pwdAdapter.get(), D3D_DRIVER_TYPE_UNKNOWN,
-            nullptr, 0, nullptr, 0, D3D11_SDK_VERSION, pwdDevice.put(), nullptr, pwdDeviceCtx.put()));
-        winrt::check_hresult(pwdAdapter->EnumOutputs(0, pwdOutput.put()));
+            nullptr, 0, featureLevels, sizeof(featureLevels) / sizeof(D3D_FEATURE_LEVEL), D3D11_SDK_VERSION, pwdDevice.put(), &level, pwdDeviceCtx.put()));
+        winrt::check_hresult(pwdAdapter->EnumOutputs(index, pwdOutput.put()));
         pwdOutput.as(pwdOutput6);
         winrt::check_pointer(pwdOutput6.get());
         pwdOutput6->GetDesc1(&output_desc1);

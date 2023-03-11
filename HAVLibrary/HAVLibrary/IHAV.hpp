@@ -23,7 +23,7 @@ public:
 	virtual winrt::hresult STDMETHODCALLTYPE CreateDevice(REFIID iid, DEV_DESC dev_desc, IDev** Out) = 0;
 	virtual winrt::hresult STDMETHODCALLTYPE CreateDemuxer(REFIID iid, IDemuxer **Out) = 0;
 	virtual winrt::hresult STDMETHODCALLTYPE CreateMuxer(REFIID iid, IMuxer **Out) = 0;
-	virtual winrt::hresult STDMETHODCALLTYPE CreateDisplay(REFIID iid, IDisplay** Out) = 0;
+	virtual winrt::hresult STDMETHODCALLTYPE CreateDisplay(REFIID iid, unsigned int index, IDisplay** Out) = 0;
 	virtual winrt::hresult STDMETHODCALLTYPE CreateDecoder(REFIID iid, IDecoder **Out) = 0;
 	virtual winrt::hresult STDMETHODCALLTYPE CreateEncoder(REFIID iid, ENCODER_DESC encoder_desc, IDev* dev, IEncoder** Out) = 0;
 	virtual winrt::hresult STDMETHODCALLTYPE CreateFrame(REFIID iid, FRAME_OUTPUT_DESC frame_desc, IFrame** Out) = 0;

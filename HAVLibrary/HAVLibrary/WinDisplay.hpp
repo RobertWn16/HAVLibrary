@@ -10,7 +10,7 @@ private:
 	winrt::com_ptr<ID3D11DeviceContext> pwdDeviceCtx;
 	winrt::com_ptr<IDXGIOutput6> pwdOutput6;
 public:
-	winrt::hresult ConfigureDisplay() noexcept;
+	winrt::hresult ConfigureDisplay(unsigned int index) noexcept;
 	winrt::hresult DisplayCapture(IVideoSource** out) noexcept final;
 	winrt::hresult GetDesc(DISPLAY_DESC &desc) final;
 };

@@ -6,6 +6,7 @@ DEFINE_GUID(IID_HAV_IDisplay,
 
 struct DISPLAY_DESC
 {
+	unsigned int display_index;
 	unsigned int width;
 	unsigned int heigth;
 	unsigned int bitdepth;
