@@ -143,7 +143,7 @@ __global__ void p016_HDR10_bgra64_HDR10_PQ_ACES_kernel(unsigned short* cuLuma,
 		G_FP32 = (G_FP32 * max_content_luminance) / SDR_NITS;
 		B_FP32 = (B_FP32 * max_content_luminance) / SDR_NITS;
 
-		//3ms
+		//Tone-mapping here //3ms
 		R_FP32 = R_FP32 * (aces_a * R_FP32 + aces_b) / (R_FP32 * (aces_c * R_FP32 + aces_d) + aces_e) * display_lum_coeff;
 		G_FP32 = G_FP32 * (aces_a * G_FP32 + aces_b) / (G_FP32 * (aces_c * G_FP32 + aces_d) + aces_e) * display_lum_coeff;
 		B_FP32 = B_FP32 * (aces_a * B_FP32 + aces_b) / (B_FP32 * (aces_c * B_FP32 + aces_d) + aces_e) * display_lum_coeff;

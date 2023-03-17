@@ -63,7 +63,7 @@ winrt::hresult FFMPEGDemuxer::VideoCapture(std::string path, IVideoSource** sour
 		}
 	}
 	if (!stream_info.max_content_luminance)
-		stream_info.max_content_luminance = 10000; // max ITU BT-2020 luminance in physical units (cd/m2)oiiiii
+		stream_info.max_content_luminance = 10000; // max ITU BT-2020 luminance in physical units (cd/m2)
 
 	if (stream_info.codec == HV_CODEC_H264 || stream_info.codec == HV_CODEC_H265_420 || stream_info.codec == HV_CODEC_VP9) {
 		if (stream_info.codec == HV_CODEC_H264)

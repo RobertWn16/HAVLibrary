@@ -25,10 +25,13 @@ winrt::hresult HAV::Link(IHAVComponent* In, IHAVComponent* Out)
         NVDEC* nv_decoder = dynamic_cast<NVDEC*>(Out);
         if (nv_decoder) {
             if (!nv_decoder->hasSource) {
+                std::cout << "Trying to link decoder " << std::endl;
                 winrt::check_hresult(nv_decoder->IsSupported(ffmpeg_source->source_desc));
+                std::cout << "Decoder linked" << std::endl;
                 winrt::check_hresult(nv_decoder->CreateParser(ffmpeg_source->source_desc));
                 nv_decoder->vSource = ffmpeg_source;
                 nv_decoder->hasSource = true;
+
                 return S_OK;
             }
             else

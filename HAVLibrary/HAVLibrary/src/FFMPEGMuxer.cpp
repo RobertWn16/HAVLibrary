@@ -29,6 +29,8 @@ static const char* HVConAVCon(HVContainer hvContainer)
     default:
         break;
     }
+
+    return "invalid";
 }
 
 winrt::hresult FFMPEGMuxer::VideoStream(std::string path, VIDEO_OUTPUT_DESC outDesc, IVideoOutput** out)
