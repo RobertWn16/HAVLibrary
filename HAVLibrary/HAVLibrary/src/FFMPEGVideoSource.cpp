@@ -16,9 +16,10 @@ winrt::hresult FFMPEGVideoSource::GetDesc(VIDEO_SOURCE_DESC& desc)
 	return S_OK;
 }
 
-winrt::hresult FFMPEGVideoSource::Parse(void* desc)
+winrt::hresult FFMPEGVideoSource::Parse(IPacket* packet)
 {
-	PACKET_DESC* pck_desc = (PACKET_DESC*)desc;
+	FFMPEGPacket* ffmpeg_packet = dynamic_cast<FFMPEGPacket*>(packet);
+	winrt::check_pointer(ffmpeg_packet);
 	while (true)
 	{
 		if (av_pck.data)
@@ -32,16 +33,12 @@ winrt::hresult FFMPEGVideoSource::Parse(void* desc)
 						av_packet_unref(&flt_pck);
 					winrt::check_hresult(AVHr(av_bsf_send_packet(source_ctx.av_bsf_context, &av_pck)));
 					winrt::check_hresult(AVHr(av_bsf_receive_packet(source_ctx.av_bsf_context, &flt_pck)));
+					winrt::check_pointer(flt_pck.data);
 
-					pck_desc->data = flt_pck.data;
-					pck_desc->size = flt_pck.size;
-					pck_desc->timestamp = flt_pck.pts;
-
+					ffmpeg_packet->RecievePacket(&flt_pck);
 					return S_OK;
 				}
-				pck_desc->data = av_pck.data;
-				pck_desc->size = av_pck.size;
-				pck_desc->timestamp = av_pck.pts;
+				ffmpeg_packet->RecievePacket(&av_pck);
 				return S_OK;
 			}
 		}

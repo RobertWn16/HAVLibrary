@@ -1,5 +1,5 @@
 #pragma once
-#include "IPacket.hpp"
+#include "FFMPEGPacket.hpp"
 #include "IDecoder.hpp"
 #include "HAVUtilsPrivate.hpp"
 
@@ -28,7 +28,7 @@ public:
 	~FFMPEGVideoSource();
 
 	winrt::hresult GetDesc(VIDEO_SOURCE_DESC &desc) final;
-	winrt::hresult Parse(void* desc) final;
+	winrt::hresult Parse(IPacket* desc) final;
 	winrt::hresult Parse(ID3D11Texture2D** Out) noexcept final;
 	void InitSource(FVContext ctx, VIDEO_SOURCE_DESC desc);
 };

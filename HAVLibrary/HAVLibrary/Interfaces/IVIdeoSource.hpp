@@ -1,5 +1,6 @@
 #pragma once
 #include "IHAVComponent.hpp"
+#include "IPacket.hpp"
 #include "HAVTypes.hpp"
 
 // {3E0E196D-A155-431F-AFA1-1BDA94298955}
@@ -31,6 +32,6 @@ class __declspec(uuid("3E0E196D-A155-431F-AFA1-1BDA94298955")) IVideoSource : pu
 {
 public:
 	virtual winrt::hresult GetDesc(VIDEO_SOURCE_DESC &desc) = 0;
-	virtual winrt::hresult Parse(void *desc) = 0;
+	virtual winrt::hresult Parse(IPacket *desc) = 0;
 	virtual winrt::hresult Parse(ID3D11Texture2D** Out) noexcept = 0;
 };

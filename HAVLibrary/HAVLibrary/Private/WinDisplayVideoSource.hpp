@@ -14,7 +14,7 @@ private:
 	winrt::com_ptr<ID3D11Texture2D> pwdsTex;
 public:
 	winrt::hresult GetDesc(VIDEO_SOURCE_DESC& desc);
-	winrt::hresult Parse(void* desc);
+	winrt::hresult Parse(IPacket* desc);
 	winrt::hresult Parse(ID3D11Texture2D **Out) noexcept final;
 	winrt::hresult ConfigureVideoSource(VIDEO_SOURCE_DESC vsrc_desc, ID3D11Device* pDevice, IDXGIOutput6* pOutputDupl);
 };

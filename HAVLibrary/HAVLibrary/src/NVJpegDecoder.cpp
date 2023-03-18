@@ -41,13 +41,13 @@ winrt::hresult NVJpegDecoder::IsSupported(VIDEO_SOURCE_DESC video_src_desc)
     return S_OK;
 }
 
-winrt::hresult NVJpegDecoder::Decode(IFrame* out)
+winrt::hresult NVJpegDecoder::Decode(IPacket* in, IFrame* out)
 {
     PACKET_DESC pck_desc = { 0 };
     NVFrame* nv_frame = dynamic_cast<NVFrame*>(out);
     try {
-        winrt::check_pointer(vSource);
-        winrt::check_hresult(vSource->Parse(&pck_desc));
+        winrt::check_pointer(in);
+        winrt::check_hresult(in->GetDesc(pck_desc));
         winrt::check_hresult(NVJPEGHr(nvjpegDecode(nvHandle, nvjpegState, reinterpret_cast<const unsigned char*>(pck_desc.data), pck_desc.size, NVJPEG_OUTPUT_BGRI, &nvjpegImage, stream)));
         winrt::check_hresult(CUDAHr(cudaMemcpy(reinterpret_cast<void*>(nv_frame->cuFrame), nvjpegImage.channel[0], NO_OF_BGR_CHANNELS * width * height, cudaMemcpyDeviceToDevice)));
     }catch (winrt::hresult_error const& err) {
@@ -55,6 +55,11 @@ winrt::hresult NVJpegDecoder::Decode(IFrame* out)
         return err.code();
     }
     return S_OK;
+}
+
+winrt::hresult NVJpegDecoder::Decode(unsigned char* buf, unsigned int length, unsigned int timestamp, IFrame* out)
+{
+    return winrt::hresult();
 }
 
 winrt::hresult NVJpegDecoder::CreateNVJpeg(VIDEO_SOURCE_DESC video_source_desc) noexcept
@@ -72,5 +77,10 @@ winrt::hresult NVJpegDecoder::CreateNVJpeg(VIDEO_SOURCE_DESC video_source_desc) 
         return err.code();
     }
 
+    return S_OK;
+}
+
+winrt::hresult NVJpegDecoder::ConfigureDecoder(VIDEO_SOURCE_DESC vsrc_desc, IDev *dev)
+{
     return S_OK;
 }

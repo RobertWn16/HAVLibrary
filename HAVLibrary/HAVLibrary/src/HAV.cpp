@@ -1,55 +1,5 @@
 #include "HAV.hpp"
 
-winrt::hresult HAV::Link(IHAVComponent* In, IHAVComponent* Out)
-{
-    DevNVIDIA* dev_nvidia = dynamic_cast<DevNVIDIA*>(In);
-    if (dev_nvidia) {
-        NVDEC* nv_decoder = dynamic_cast<NVDEC*>(Out);
-        if (nv_decoder) {
-            if (!nv_decoder->hasDevice) {
-                nv_decoder->deviceContext = dev_nvidia->GetContext();
-                nv_decoder->hasDevice = true;
-                return S_OK;
-            }
-            else
-                return E_HV_ALREADY_LINKED;
-        }
-
-        NVENC* nv_encoder = dynamic_cast<NVENC*>(Out);
-        return E_INVALIDARG;
-    }
-
-    FFMPEGVideoSource* ffmpeg_source = dynamic_cast<FFMPEGVideoSource*>(In);
-    if (ffmpeg_source)
-    {
-        NVDEC* nv_decoder = dynamic_cast<NVDEC*>(Out);
-        if (nv_decoder) {
-            if (!nv_decoder->hasSource) {
-                std::cout << "Trying to link decoder " << std::endl;
-                winrt::check_hresult(nv_decoder->IsSupported(ffmpeg_source->source_desc));
-                std::cout << "Decoder linked" << std::endl;
-                winrt::check_hresult(nv_decoder->CreateParser(ffmpeg_source->source_desc));
-                nv_decoder->vSource = ffmpeg_source;
-                nv_decoder->hasSource = true;
-
-                return S_OK;
-            }
-            else
-                return E_HV_ALREADY_LINKED;
-        }
-        NVJpegDecoder* nvjpeg_decoder = dynamic_cast<NVJpegDecoder*>(Out);
-        if (nvjpeg_decoder) {
-                winrt::check_hresult(nvjpeg_decoder->IsSupported(ffmpeg_source->source_desc));
-                winrt::check_hresult(nvjpeg_decoder->CreateNVJpeg(ffmpeg_source->source_desc));
-                nvjpeg_decoder->vSource = ffmpeg_source;
-                return S_OK;
-        }
-        return E_INVALIDARG;
-    }
-
-    return S_OK;
-}
-
 winrt::hresult __stdcall HAV::CreateDevice(REFIID iid, DEV_DESC dev_desc, IDev** Out)
 {
     if (IsEqualIID(iid, IID_HAV_NVDev)) {
@@ -130,7 +80,7 @@ winrt::hresult __stdcall HAV::CreateDisplay(REFIID iid, unsigned int index, IDis
     return winrt::hresult();
 }
 
-winrt::hresult __stdcall HAV::CreateDecoder(REFIID iid, IDecoder** Out)
+winrt::hresult __stdcall HAV::CreateDecoder(REFIID iid, VIDEO_SOURCE_DESC vsrc_desc, IDev* dev, IDecoder** Out)
 {
     winrt::com_ptr<IDecoder> dec_ptr;
     if (IsEqualIID(iid, IID_HAV_NVDEC))
@@ -139,6 +89,7 @@ winrt::hresult __stdcall HAV::CreateDecoder(REFIID iid, IDecoder** Out)
             winrt::check_pointer(Out);
             dec_ptr = winrt::make_self<NVDEC>();
             winrt::check_pointer(dec_ptr.get());
+            winrt::check_hresult(dynamic_cast<NVDEC*>(dec_ptr.get())->ConfigureDecoder(vsrc_desc, dev));
             *Out = dec_ptr.get();
             dec_ptr.detach();
             return S_OK;
@@ -153,6 +104,7 @@ winrt::hresult __stdcall HAV::CreateDecoder(REFIID iid, IDecoder** Out)
             winrt::check_pointer(Out);
             dec_ptr = winrt::make_self<NVJpegDecoder>();
             winrt::check_pointer(dec_ptr.get());
+            winrt::check_hresult(dynamic_cast<NVJpegDecoder*>(dec_ptr.get())->ConfigureDecoder(vsrc_desc, dev));
             *Out = dec_ptr.get();
             dec_ptr.detach();
             return S_OK;

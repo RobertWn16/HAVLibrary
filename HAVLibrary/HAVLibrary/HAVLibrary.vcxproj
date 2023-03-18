@@ -173,6 +173,7 @@
     <CudaCompile Include="CuKernels\ColorSpaceConversion.cuh" />
     <ClInclude Include="CuKernels\LUTS.cuh" />
     <ClInclude Include="Interfaces\HAVFactory.hpp" />
+    <ClInclude Include="Interfaces\HAVTypes.hpp" />
     <ClInclude Include="Interfaces\IDecoder.hpp" />
     <ClInclude Include="Interfaces\IDemuxer.hpp" />
     <ClInclude Include="Interfaces\IDev.hpp" />
@@ -194,7 +195,6 @@
     <ClInclude Include="Private\FFMPEGVideoOutput.hpp" />
     <ClInclude Include="Private\FFMPEGVideoSource.hpp" />
     <ClInclude Include="Private\HAV.hpp" />
-    <ClInclude Include="Private\HAVTypes.hpp" />
     <ClInclude Include="Private\HAVUtilsPrivate.hpp" />
     <ClInclude Include="Private\NVDEC.hpp" />
     <ClInclude Include="Private\NVENC.hpp" />

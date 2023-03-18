@@ -27,6 +27,10 @@ public:
 	~NVJpegDecoder();
 
 	winrt::hresult IsSupported(VIDEO_SOURCE_DESC video_src_desc) final;
-	winrt::hresult Decode(IFrame* out) final;
+	winrt::hresult Decode(IPacket* in, IFrame* out) final;
+	winrt::hresult Decode(unsigned char* buf, unsigned int length, unsigned int timestamp, IFrame* out);
 	winrt::hresult CreateNVJpeg(VIDEO_SOURCE_DESC video_src_desc) noexcept;
+
+public:
+	winrt::hresult ConfigureDecoder(VIDEO_SOURCE_DESC vsrc_desc, IDev *dev) final;
 };

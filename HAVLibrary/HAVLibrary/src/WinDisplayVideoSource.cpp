@@ -8,9 +8,9 @@ winrt::hresult WinDisplayVideoSource::GetDesc(VIDEO_SOURCE_DESC& desc)
     return S_OK;
 }
 
-winrt::hresult WinDisplayVideoSource::Parse(void* desc)
+winrt::hresult WinDisplayVideoSource::Parse(IPacket* desc)
 {
-    return winrt::hresult();
+    return S_OK;
 }
 SYSTEMTIME start, stop;
 winrt::hresult WinDisplayVideoSource::Parse(ID3D11Texture2D **Out) noexcept

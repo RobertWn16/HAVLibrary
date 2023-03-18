@@ -14,4 +14,6 @@ struct PACKET_DESC
 
 class __declspec(uuid("D31D1F45-A653-4668-BE4B-A074668FA9CD")) IPacket : public IHAVComponent
 {
+public:
+	virtual winrt::hresult GetDesc(PACKET_DESC& desc) = 0;
 };

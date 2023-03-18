@@ -1,4 +1,5 @@
 #pragma once
+#include "devNVIDIA.hpp"
 #include "IDecoder.hpp"
 #include "HAVUtilsPrivate.hpp"
 #include "NVFrame.hpp"
@@ -7,9 +8,11 @@
 struct NVDEC : winrt::implements<NVDEC, IDecoder>
 {
 private:
+	VIDEO_SOURCE_DESC cuVideo_desc;
 	CUvideodecoder cuDecoder;
 	CUvideoparser cuParser;
 	cudaVideoCodec cuvidCodec;
+	CUcontext deviceContext;
 	std::mutex cuLock;
 	std::queue<CUdeviceptr> cuBuffer;
 	CUdeviceptr dec_bkbuffer = 0;
@@ -23,15 +26,17 @@ private:
 public:
 	~NVDEC();
 	winrt::hresult IsSupported(VIDEO_SOURCE_DESC desc) final;
-	winrt::hresult Decode(IFrame *out) final;
+	winrt::hresult Decode(IPacket* in, IFrame *out) final;
+	winrt::hresult Decode(unsigned char* buf, unsigned int length, unsigned int timestamp, IFrame* out) final;
 	winrt::hresult CreateParser(VIDEO_SOURCE_DESC desc);
 
 public:
+	winrt::hresult ConfigureDecoder(VIDEO_SOURCE_DESC vsrc_desc, IDev *dev) final;
+
+public:
 	IVideoSource* vSource;
-	CUcontext deviceContext;
 	bool hasDevice = false;
 	bool hasSource = false;
-
 };
 
 static unsigned long GetNumDecodeSurfaces(cudaVideoCodec eCodec, unsigned int nWidth, unsigned int nHeight)
