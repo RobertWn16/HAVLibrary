@@ -152,6 +152,24 @@ winrt::hresult NVENC::GetEncodedPacket(IPacket* outPkt)
     return S_OK;
 }
 
+winrt::hresult NVENC::GetSequenceParams(unsigned int* size, void** spps)
+{
+    char* buf = new char[NV_MAX_SEQ_HDR_LEN];
+    int outSize = 0;
+    NV_ENC_SEQUENCE_PARAM_PAYLOAD nvenc_payload = { NV_ENC_SEQUENCE_PARAM_PAYLOAD_VER };
+    nvenc_payload.inBufferSize = NV_MAX_SEQ_HDR_LEN;
+    nvenc_payload.spsId = 0;
+    nvenc_payload.ppsId = 0;
+    nvenc_payload.spsppsBuffer = buf;
+    nvenc_payload.outSPSPPSPayloadSize = (uint32_t*)&outSize;
+
+    nvenc.nvEncGetSequenceParams(nvencPtr, &nvenc_payload);
+
+    *spps = buf;
+    *size = outSize;
+    return S_OK;
+}
+
 winrt::hresult NVENC::ConfigureEncoder(ENCODER_DESC nvDesc, CUcontext deviceContext)
 {
     try
@@ -191,9 +209,14 @@ winrt::hresult NVENC::ConfigureEncoder(ENCODER_DESC nvDesc, CUcontext deviceCont
         nvencParams.enableSubFrameWrite = 0;
         nvencPresetConf.presetCfg.frameIntervalP = 1;
         nvencParams.encodeConfig = &nvencPresetConf.presetCfg;
-        nvencParams.encodeConfig->gopLength = 1;
+        nvencParams.encodeConfig->gopLength = NVENC_INFINITE_GOPLENGTH;
+        nvencParams.encodeConfig->encodeCodecConfig.h264Config.repeatSPSPPS = 1;
         nvencParams.encodeConfig->rcParams.rateControlMode = NV_ENC_PARAMS_RC_CBR;
-
+        nvencParams.encodeConfig->rcParams.averageBitRate = 20000000;
+        //nvencParams.encodeConfig->rcParams.multiPass = _NV_ENC_MULTI_PASS::NV_ENC_TWO_PASS_QUARTER_RESOLUTION;
+        //nvencParams.encodeConfig->encodeCodecConfig.h264Config.sliceMode = 1;
+        //nvencParams.encodeConfig->encodeCodecConfig.h264Config.sliceModeData = 1500 - 28;
+            
         winrt::check_hresult(NVENCStatHr(nvenc.nvEncInitializeEncoder(nvencPtr, &nvencParams)));
 
         cuCtxPushCurrent(nvencCtx);

@@ -27,4 +27,5 @@ public:
 	virtual winrt::hresult IsSupported(VIDEO_SOURCE_DESC desc) = 0;
 	virtual winrt::hresult Encode(IFrame* inFrame) = 0;
 	virtual winrt::hresult GetEncodedPacket(IPacket* outPacket) = 0;
+	virtual winrt::hresult GetSequenceParams(unsigned int* size, void** spps) = 0;
 };

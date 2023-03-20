@@ -42,5 +42,6 @@ public:
 	winrt::hresult IsSupported(VIDEO_SOURCE_DESC desc);
 	winrt::hresult Encode(IFrame* inFrame);
 	winrt::hresult GetEncodedPacket(IPacket* outPacket);
+	winrt::hresult GetSequenceParams(unsigned int* size, void** spps);
 	winrt::hresult ConfigureEncoder(ENCODER_DESC nvencDesc, CUcontext deviceContext);
 };
