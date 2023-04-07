@@ -12,7 +12,7 @@ winrt::hresult WinDisplayVideoSource::Parse(IPacket* desc)
 {
     return S_OK;
 }
-SYSTEMTIME start, stop;
+
 winrt::hresult WinDisplayVideoSource::Parse(ID3D11Texture2D **Out) noexcept
 {
     DXGI_OUTDUPL_FRAME_INFO outdpl_frame_info = { 0 };
@@ -63,17 +63,14 @@ winrt::hresult WinDisplayVideoSource::ConfigureVideoSource(VIDEO_SOURCE_DESC vsr
         pwdsDevice = pDevice;
         pwdsDevice->GetImmediateContext(&pwdsDeviceCtx);
         winrt::check_pointer(&pwdsDeviceCtx);
-        std::cout << "Starting duplication" << std::endl;
         winrt::check_pointer(pdxgiOutput);
         winrt::check_hresult(pdxgiOutput->DuplicateOutput(pDevice, &pdxgiOutputDupl));
         pwdsOutputDupl.attach(pdxgiOutputDupl);
         video_source_desc = vsrc_desc;
 
-        std::cout << "Succedeed duplication. Width of stream " << video_source_desc.width << std::endl;
         DXGI_OUTDUPL_DESC outdupl_desc = {0};
         pwdsOutputDupl->GetDesc(&outdupl_desc);
         video_source_desc.framerate = (double)(outdupl_desc.ModeDesc.RefreshRate.Numerator) / outdupl_desc.ModeDesc.RefreshRate.Denominator;
-
 
         D3D11_TEXTURE2D_DESC tex_desc = {0};
         tex_desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -85,7 +82,6 @@ winrt::hresult WinDisplayVideoSource::ConfigureVideoSource(VIDEO_SOURCE_DESC vsr
         tex_desc.BindFlags = D3D11_BIND_RENDER_TARGET;
         tex_desc.Usage = D3D11_USAGE_DEFAULT;
         winrt::check_hresult(pwdsDevice->CreateTexture2D(&tex_desc, nullptr, pwdsTex.put()));
-
 
     }catch (winrt::hresult_error const& err) {
         std::cout << std::hex << err.code();

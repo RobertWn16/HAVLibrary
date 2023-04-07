@@ -173,17 +173,10 @@ winrt::hresult NVFrame::CommitFrame()
 
 winrt::hresult NVFrame::ConfigureFrame(FRAME_OUTPUT_DESC desc)
 {
-    if (desc.width == 0 || desc.height == 0)
-        return E_INVALIDARG;
-    if (desc.format < HV_FORMAT_RGBA8 || desc.format > HV_FORMAT_P016)
-        return E_INVALIDARG;
-
     try {
-        if (desc.content_colorspace == HV_COLORSPACE_UNKNOWN)
+        if (desc.width == 0 || desc.height == 0)
             return E_INVALIDARG;
-        if (desc.width < 0 || desc.height < 0)
-            return E_INVALIDARG;
-        if (desc.format == HV_FORMAT_UNKNOWN)
+        if (desc.format < HV_FORMAT_RGBA8 || desc.format > HV_FORMAT_P016)
             return E_INVALIDARG;
 
         winrt::check_hresult(CUDAHr(cudaMalloc((void**)&cuFrame, GetChannelFactor(desc.format) * desc.width * desc.height)));
@@ -225,9 +218,11 @@ winrt::hresult NVFrame::ConfigureFrame(FRAME_OUTPUT_DESC desc)
         default:
             break;
         }
+        if (desc.content_colorspace != HV_COLORSPACE_UNKNOWN) {
+            ComputeColorimetryMatrix(cuDesc.content_colorimetry, content_Colorimetry_XYZ, content_Colorimetry_XYZ_Inverse);
+            ComputeColorimetryMatrix(cuDesc.display_colorimetry, display_Colorimetry_XYZ, display_Colrimetry_XYZ_Inverse);
+        }
 
-        ComputeColorimetryMatrix(cuDesc.content_colorimetry, content_Colorimetry_XYZ, content_Colorimetry_XYZ_Inverse);
-        ComputeColorimetryMatrix(cuDesc.display_colorimetry, display_Colorimetry_XYZ, display_Colrimetry_XYZ_Inverse);
 
     }catch (winrt::hresult_error const& err) {
         return err.code();

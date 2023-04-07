@@ -51,6 +51,7 @@ winrt::hresult NVENC::IsSupported(VIDEO_SOURCE_DESC desc)
     return S_OK;
 }
 
+int hIndex = 0;
 winrt::hresult NVENC::Encode(IFrame* inFrame)
 {
     NVFrame* nv_frame = dynamic_cast<NVFrame*>(inFrame);
@@ -202,20 +203,33 @@ winrt::hresult NVENC::ConfigureEncoder(ENCODER_DESC nvDesc, CUcontext deviceCont
         nvencParams.darWidth = nvencDesc.encoded_width;
         nvencParams.darHeight = nvencDesc.encoded_height;
         nvencParams.enableEncodeAsync = true;
-        nvencParams.frameRateNum = nvencDesc.framerate_num;
+        nvencParams.frameRateNum = 60;
         nvencParams.frameRateDen = nvencDesc.framerate_den;
         nvencParams.enablePTD = 1;
         nvencParams.reportSliceOffsets = 0;
         nvencParams.enableSubFrameWrite = 0;
         nvencPresetConf.presetCfg.frameIntervalP = 1;
         nvencParams.encodeConfig = &nvencPresetConf.presetCfg;
-        nvencParams.encodeConfig->gopLength = NVENC_INFINITE_GOPLENGTH;
         nvencParams.encodeConfig->encodeCodecConfig.h264Config.repeatSPSPPS = 1;
-        nvencParams.encodeConfig->rcParams.rateControlMode = NV_ENC_PARAMS_RC_CBR;
-        nvencParams.encodeConfig->rcParams.averageBitRate = 20000000;
-        //nvencParams.encodeConfig->rcParams.multiPass = _NV_ENC_MULTI_PASS::NV_ENC_TWO_PASS_QUARTER_RESOLUTION;
-        //nvencParams.encodeConfig->encodeCodecConfig.h264Config.sliceMode = 1;
-        //nvencParams.encodeConfig->encodeCodecConfig.h264Config.sliceModeData = 1500 - 28;
+        nvencParams.encodeConfig->rcParams.rateControlMode = NV_ENC_PARAMS_RC_CONSTQP;
+        //nvencParams.encodeConfig->rcParams.averageBitRate = 9000000;
+        //nvencParams.encodeConfig->rcParams.maxBitRate = 10000000;
+        nvencParams.encodeConfig->rcParams.constQP = { 28, 31, 25 };
+        nvencParams.encodeConfig->gopLength = 60;
+        nvencParams.encodeConfig->encodeCodecConfig.h264Config.maxNumRefFrames = 1;
+        //nvencParams.encodeConfig->profileGUID = NV_ENC_H264_PROFILE_HIGH_444_GUID;
+        //nvencParams.encodeConfig->encodeCodecConfig.h264Config.adaptiveTransformMode = NV_ENC_H264_ADAPTIVE_TRANSFORM_ENABLE;
+        nvencParams.encodeConfig->encodeCodecConfig.h264Config.sliceMode = 3;
+        nvencParams.encodeConfig->encodeCodecConfig.h264Config.sliceModeData = 4;
+        nvencParams.encodeConfig->encodeCodecConfig.h264Config.idrPeriod = 250;
+        nvencParams.encodeConfig->encodeCodecConfig.h264Config.useBFramesAsRef = NV_ENC_BFRAME_REF_MODE_DISABLED;
+        nvencParams.encodeConfig->encodeCodecConfig.h264Config.enableIntraRefresh = 1;
+        nvencParams.encodeConfig->encodeCodecConfig.h264Config.intraRefreshCnt = 20;
+        nvencParams.encodeConfig->encodeCodecConfig.h264Config.intraRefreshPeriod = 40;
+        /*nvencParams.encodeConfig->rcParams.enableAQ = 1;
+        nvencParams.encodeConfig->rcParams.aqStrength = 1;*/
+        //nvencParams.encodeConfig->rcParams.enableTemporalAQ = 1;
+
             
         winrt::check_hresult(NVENCStatHr(nvenc.nvEncInitializeEncoder(nvencPtr, &nvencParams)));
 
